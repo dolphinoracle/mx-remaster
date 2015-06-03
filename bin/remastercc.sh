@@ -61,7 +61,7 @@ export ControlCenter=$(cat <<End_of_Text
 	<button>
 	<label>"Help"</label>
 	<input file>"/usr/share/mx-remaster/icons/gnome-help.png"</input>
-	<action>mx-viewer http://mepiscommunity.org/doc_mx/remaster.html &</action>
+	<action>mx-viewer http://mepiscommunity.org/wiki/help-files/help-live-remasterpersistence-remastercc &</action>
 	</button>
         <text><label>"            "</label></text>
 	<pixmap>
