@@ -6,18 +6,26 @@
 antiX_lib=/usr/local/lib/antiX
 source $antiX_lib/antiX-common.sh     "$@"
 
+last_ps_file=$LIVE_DIR/config/last-persist-save
+last_as_file=$LIVE_DIR/config/last-auto-save
+
 TITLE="$(gt "antiX Root Persistence Auto-Save Configuration")"
 
-CONF_FILE=/etc/live/config/persist-config.conf
-PERSIST_SAVE_CONF=/live/config/persist-save.conf
+LOCKOUT_TIME=15
 
-_Automatic_="$(gt "Automatic")"
+CONF_FILE=/etc/live/config/persist-config.conf
+
+     _Automatic_="$(gt "Automatic")"
 _Semi_Automatic_="$(gt "Semi-Automatic")"
-_Manual_="$(gt "Manual")"
+        _Manual_="$(gt "Manual")"
+          _Quit_="$(gt "Quit")"
+
+[ -e $LIVE_DIR/config/persist-save.conf \
+    -o -e $LIVE_DIR/config/save-persist ]  && SHOULD_RUN=true
 
 BLURB="
     $(gt "Configure root persistence saves to run either:")
-                                                          
+
     1) [b]$_Automatic_[/] ($(gt "at shutdown/reboot, no asking"))
     2) [b]$_Semi_Automatic_[/] ($(gt "ask at shutdown/reboot"))
     3) [b]$_Manual_[/] ($(gt "you snooze, you lose"))"
@@ -65,7 +73,11 @@ start_logging
 
 exit_command() {
     [ "$OPT_COMMAND" ]  || exit 0
-    chvt 1 2>/dev/null
+
+    # chvt so we see shutdown messages on tty1
+    case $OPT_COMMAND in
+        reboot|poweroff) sync; chvt 1 2>/dev/null ;;
+    esac
     exec $OPT_COMMAND
 }
 
@@ -79,18 +91,21 @@ edit_config() {
     fi
 
     fmt="[fixed][b]%15s:[/][/] %s   "
-    combo_box save-mode "$_Automatic_!$_Semi_Automatic_!$_Manual_" -a  \
+    combo_box save-mode "1 $_Automatic_!2 $_Semi_Automatic_!3 $_Manual_!4 $_Quit_" -n \
         "$TITLE" ""                                                    \
         "Please choose auto-save mode."                                \
         ""                                                             \
         "$mode_str"                                                    \
         ""                                                             \
-        "$(pf "$fmt" $_Automatic_      "`gt "save on shutdown/reboot automatically.  No asking."`")"   \
-        "$(pf "$fmt" $_Semi_Automatic_ "`gt "ask to save on shutdown/reboot."`")"                      \
-        "$(pf "$fmt" $_Manual_         "`gt "only save changes manually (you snooze, you lose)."`")"   \
+        "$(pf "$fmt" "$_Automatic_"      "`gt "save on shutdown/reboot automatically.  No asking."`")"   \
+        "$(pf "$fmt" "$_Semi_Automatic_" "`gt "ask to save on shutdown/reboot."`")"                      \
+        "$(pf "$fmt" "$_Manual_"         "`gt "only save changes manually (you snooze, you lose)."`")"   \
+        "$(pf "$fmt" "$_Quit_"           "`gt "use current default."`")"                                 \
         ""
 
-    AUTOSAVE_MODE="$UI_RESULT"
+    AUTOSAVE_MODE=$UI_RESULT
+
+    [ -z "${AUTOSAVE_MODE##4*}" ] && exit
 
     [ -f $CONF_FILE ] || mkdir -p $(dirname $CONF_FILE)
 
@@ -114,8 +129,8 @@ only_once_box() {
 if  [ "$SET_START_UP" ]; then
 #------------------------------------------------------------------------------
 
-    [ -f $PERSIST_SAVE_CONF ] || exit 0
-    [ -f $CONF_FILE ]         && exit 0
+    [ "$SHOULD_RUN" ] || exit 0
+    [ -f $CONF_FILE ] && exit 0
 
     only_once_box
     edit_config
@@ -124,7 +139,7 @@ if  [ "$SET_START_UP" ]; then
 elif [ "$SET_SHUT_DOWN" ]; then
 #------------------------------------------------------------------------------
 
-    [ -f $PERSIST_SAVE_CONF ] || exit_command
+    [ "$SHOULD_RUN" ] || exit_command
 
     if ! [ -f "$CONF_FILE" ]; then
 
@@ -132,31 +147,51 @@ elif [ "$SET_SHUT_DOWN" ]; then
         edit_config
     fi
 
+    now=$(date +%s)
+    for file in $last_as_file $last_ps_file; do
+        test -r $file || continue
+        read prev 2>/dev/null < $file
+        diff=$(( $now - $prev))
+        if [ $diff -le $LOCKOUT_TIME ]; then
+            timeout_box 2 \
+                "$(pfgt "Already saved less than %s seconds ago" $diff)" \
+                "$(pfgt "Won't autosave within %s seconds of a previous save" $LOCKOUT_TIME)"
+
+            exit_command
+        fi
+    done
+
     source $CONF_FILE
 
     [ "$AUTOSAVE_MODE" ] || exit_command
 
     vmsg "AUTOSAVE_MODE=$AUTOSAVE_MODE"
+    persist_opts=--quiet
     case "$AUTOSAVE_MODE" in
-        $_Automatic_)
-            persist_opts=--quiet
-            ;;
-        $_Semi_Automatic_)
-            ;;
-        $_Manual_)
-            vmsg "Not auto-saving.  AUTOSAVE_MODE was set to $AUTOSAVE_MODE"
-            exit_command
-            ;;
-        *)
-            okay_box "$TITLE" "" \
-                "$(pfgt "Unknown auto-save mode %s.  Defaulting to $s." "[b]$AUTOSAVED_MODE[/]" "[b]$_Semi_Automatic_[/]")" ;;
+        1*) ;;
+        2*) persist_opts= ;;
+        3*) vmsg "Not auto-saving.  AUTOSAVE_MODE was set to $AUTOSAVE_MODE"
+            exit_command ;;
+        *)  okay_box "$TITLE" "" \
+                "$(pfgt "Unknown auto-save mode %s.  Defaulting to $s." "[b]$AUTOSAVED_MODE[/]" "[b]$_Automatic_[/]")" ;;
     esac
     [ "$SET_VERBOSE" ] && persist_opts="$persist_opts --verbose"
     [ "$SET_GUI" ]     || persist_opts="$persist_opts --cli"
 
-    vmsg "running perist-save($persist_opts )"
-    sudo persist-save $persist_opts 2>&1  && exit_command
+    rm -f $last_ps_file
 
+    vmsg "running perist-save $persist_opts"
+
+    persist-save $persist_opts 2>&1
+    ret=$?
+
+    # ALWAYS say we did an autosave even if it failed or was aborted
+    # Do it *after* running persist-save in case it takes time
+    date +%s > $last_as_file
+
+    [ $ret -eq 0 ] && exit_command
+
+    # Only get here if persist-save exited abnormally
     [ "$OPT_COMMAND" ] || exit 0
 
     yes_no_box "$(gt "CONFIRM") $OPT_COMMAND" ""                    \

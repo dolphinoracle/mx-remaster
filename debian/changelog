@@ -1,20 +1,18 @@
-mx-remaster (0.1.4mx15) mx; urgency=medium
+mx-remaster (0.1.5mx150+2) mx; urgency=low
 
-  * changed suffix to just mx15
+  * Removed halt and reboot symlinks
+  * Fixed xfce4-session-logout formatting
+  * Included correct translations
 
- -- Kent Mathern <maintainer@mepiscommunity.org>  Thu, 11 Jun 2015 22:09:37 -0400
+ -- Kent Mathern <maintainer@mepiscommunity.org>  Thu, 15 Oct 2015 15:11:36 -0400
 
-mx-remaster (0.1.4mx150+1) mx; urgency=medium
 
-  * repackaged for MX-15
+mx-remaster (0.1.5mx150+1) mx; urgency=low
 
- -- Kent Mathern <maintainer@mepiscommunity.org>  Thu, 11 Jun 2015 19:26:53 -0400
+  * update to antiX versions
 
-mx-remaster (0.1.4mx140+4) mx; urgency=low
+ -- Kent Mathern <maintainer@mepiscommunity.org>  Fri, 02 Oct 2015 18:06:36 -0400
 
-  * update help link 
-
- -- Kent Mathern <maintainer@mepiscommunity.org>  Wed, 03 Jun 2015 18:47:50 -0400
 
 mx-remaster (0.1.4mx140+3) mx; urgency=low
 
