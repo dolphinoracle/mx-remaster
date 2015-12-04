@@ -10,10 +10,18 @@
 # bits.
 #
 
+# Make sure disabled live services are restored
 restore=/live/etc/init.d/live-restore-services
 
 [ -x $restore ] && $restore start
 
-/usr/local/bin/BroadcomStartup_rev5
+# Detect and set up correct broadcom
+/usr/local/bin/BroadcomStartup
+
+# Set up 12 hour clock format for some countries eg US
+/usr/local/bin/clock12or24
+
+# Automatically switch to vt2 when db+ cheat is used
+egrep -q "(^| )db\+( |$)" /proc/cmdline && chvt 2
 
 exit 0

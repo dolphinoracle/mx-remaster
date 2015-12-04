@@ -37,7 +37,7 @@ PRETEND=
 
 PW_FILES="/etc/passwd /etc/shadow /etc/gshadow /etc/group"
 MUNGE_FILES="/etc/slim.conf /etc/lightdm/lightdm.conf"
-BIND_FILES="$PW_FILES $MUNGE_FILES"
+BIND_FILES="$PW_FILES"
 
 LIVE_FILE_LIST="
 /etc/desktop-session/startup
@@ -55,7 +55,9 @@ LIVE_FILE_LIST="
 /etc/skel/.fluxbox/menu
 /etc/skel/.icewm/menu
 /etc/skel/.jwm/menu
+/etc/skel/Desktop/Installer.desktop
 /etc/udev/rules.d/90-fstab-automount.rules
+/usr/share/applications/mx/minstall.desktop
 "
 
 GENERAL_LIVE_FILE_LIST="
@@ -75,15 +77,18 @@ This is needed because sometimes we create directories and touch files.
 
 Commands:
     start               Do the main bind mount and create cleanup.conf
+
     status              Show status including contents of cleanup.conf
 
     live-files          bind mount files under $TEMPLATE_DIR/files
+
     general-files       bind mount files under $TEMPLATE_DIR/general-files
-    all-files           same as "live-files general-files"
 
     passwd              Make general purpose password/group files
 
     add=<dir1,dir2,..>  Add files from the dirs template
+
+    bind=<dir1,dir2,..>  Bind mount each dir IF it is a mountpoint
 
     general             Same as "all-files passwd"
 
@@ -93,16 +98,19 @@ Commands:
                         Bind mount empty directories at these locations
 
     exclude[=<prefix>] file1 file2 ...
-                        Generate an exclude list from the files listed.
-                        Prepend each entry with <prefix> if it is given.
+                        Generate an exclude list from the files listed. Prepend
+                        each entry with <prefix> if it is given.  (This is a
+                        convenience routine for use with mksquashfs).
 
     version-file[=<title>]
-                        Create a standard linuxfs.ver file and bind mount it
-                        at the appropriate location: $VERSION_FILE
+                        Create a standard linuxfs.ver file and bind mount it at
+                        the appropriate location: $VERSION_FILE
 
-    populate-live-files=<from-dir>
+    populate-live-files <from-dir> [<to-dir>]
                         Populate the $TEMPLATE_DIR with files extracted from
                         <from-dir>.  This is usually a mounted linuxfs file.
+                        The optional <to-dir> is the top level directory under
+                        which we will put the template directory.
 Options:
 
     -b --bind-root=<dir>       The root of the new fs.   Default: $BIND_ROOT
@@ -117,8 +125,7 @@ Options:
     -u --user=<user:password>  Default username and optional password
     -w --work=<dir>            Temporary directory to hold our work: $WORK_DIR
 
-    -v --verbose                Print more
-    -q --quiet                  Print less
+    -v --verbose               Print more
 
 Note: if passwords aren't given then the username is used as the password.
 
@@ -139,7 +146,7 @@ main() {
     [ $# -eq 0 ] && usage
 
     local param val
-    local short_stack="bdefFhoprtuvq"
+    local short_stack="bdefFhoprtuv"
     while [ $# -gt 0 -a -n "$1" -a -z "${1##-*}" ]; do
         param=${1#-}
         shift
@@ -177,7 +184,6 @@ main() {
              -output=*|o=*) OUTPUT_FILE=$val                  ;;
                  -output|o) OUTPUT_FILE=$val                  ;;
                 -pretend|p) PRETEND=true                      ;;
-                  -quiet|q) QUIET=true                        ;;
                -root=*|r=*) ROOT_PW=$val                      ;;
                    -root|r) ROOT_PW=$val                      ;;
            -template=*|t=*) TEMPLATE_DIR=$val                 ;;
@@ -196,16 +202,16 @@ main() {
     [ $# -eq 0 ] && fatal "Expected as least one commmand"
 
     while [ $# -gt 0 ]; do
-    local val cmd=$1
-    shift
-    val=${cmd#*=}
+        local val cmd=$1
+        shift
+        val=${cmd#*=}
         case $cmd in
               start) do_start         $CONF_FILE $WORK_DIR             ;;
              status) do_status        $CONF_FILE                       ;;
               add=*) do_add           $CONF_FILE $WORK_DIR "$val"      ;;
+             bind=*) do_bind          $CONF_FILE $WORK_DIR "$val"      ;;
          live-files) do_live_files    $CONF_FILE $WORK_DIR             ;;
       general-files) do_general_files $CONF_FILE $WORK_DIR             ;;
-          all-files) do_all_files     $CONF_FILE $WORK_DIR             ;;
             general) do_general       $CONF_FILE $WORK_DIR             ;;
              passwd) do_passwd        $CONF_FILE                       ;;
             cleanup) do_cleanup       $CONF_FILE $WORK_DIR             ;;
@@ -215,7 +221,7 @@ main() {
           exclude=*) do_exclude       "$val" "$@" ; exit 0             ;;
             exclude) do_exclude       ""     "$@" ; exit 0             ;;
 
- populate-live-files=*) do_populate_live "$val"                        ;;
+ populate-live-files) do_populate_live "$@"                            ;;
 
                   *) fatal "Unexpected command: $cmd."
         esac
@@ -223,10 +229,13 @@ main() {
 }
 
 do_populate_live() {
-    local from_dir=$1
+    [ $# -lt 1 ] && fatal "Missing <from> directory"
+    local from_dir=$1  to_dir=$2
     test -d "$from_dir" || fatal "$from is not a directory"
-    copy_files "$from_dir" "$LIVE_FILE_LIST"         "$TEMPLATE_DIR/files"
-    copy_files "$from_dir" "$GENERAL_LIVE_FILE_LIST" "$TEMPLATE_DIR/general-files"
+    copy_files "$from_dir" "$LIVE_FILE_LIST"         "$to_dir$TEMPLATE_DIR/files"
+    copy_files "$from_dir" "$GENERAL_LIVE_FILE_LIST" "$to_dir$TEMPLATE_DIR/general-files"
+
+    exit 0
 }
 
 copy_files() {
@@ -243,7 +252,7 @@ copy_files() {
         test -e $file || continue
         local dest_file=${file#$from_dir}
         local dest=$to_dir$dest_file
-        local dist_dir=$(dirname $dest)
+        local dest_dir=$(dirname $dest)
         test -d $dest_dir || pretend mkdir -p $dest_dir
         pretend cp -a $file $dest
     done
@@ -307,7 +316,7 @@ do_start() {
     test -e $work_dir && rm -rf $work_dir
 
     mkdir -p $BIND_ROOT || fatal "Could not make bind root directory $BIND_ROOT"
-    if mountpoint -q $BIND_ROOT &>/dev/null; then
+    if is_mounted $BIND_ROOT &>/dev/null; then
 
         [ -z "$FORCE" ] && fatal "bind-root: $BIND_ROOT is already a mount point"
 
@@ -323,10 +332,11 @@ do_add() {
 
     read_conf_file $conf_file
 
-    local dir
+    local dir real_dir real_root=${REAL_ROOT%/}
     echo "$dirs" | tr ',' '\n' | while read dir; do
 	    [ "$dir" ] || continue
-        test -d $dir || fatal "Add dir: $dir is not a directory"
+        real_dir=$real_root/${dir#/}
+        test -d $real_dir || fatal "Add dir: $real_dir is not a directory"
         bind_mount_template "$dir" "$BIND_ROOT" "$REAL_ROOT"
     done
 
@@ -334,12 +344,31 @@ do_add() {
 
 }
 
+do_bind() {
+    local conf_file=$1  work_dir=$2  dirs=$3
+
+    read_conf_file $conf_file
+
+    local dir real_dir real_root=${REAL_ROOT%/}
+    echo "$dirs" | tr ',' '\n' | while read dir; do
+        dir=${dir#/}
+	    [ "$dir" ] || continue
+
+        real_dir=$real_root/$dir
+
+        mountpoint -q $real_dir || continue
+        pretend mount --bind $real_dir $BIND_ROOT/$dir
+    done
+
+    write_conf_file $CONF_FILE
+}
+
 do_empty() {
     local conf_file=$1  work_dir=$2  dirs=$3
 
     read_conf_file $conf_file
 
-    bind_empty_dirs "$WORK_DIR/empty" "$BIND_ROOT" "$REAL_ROOT" "$dir"
+    bind_empty_dirs "$WORK_DIR/empty" "$BIND_ROOT" "$REAL_ROOT" "$dirs"
 }
 
 do_status() {
@@ -355,7 +384,7 @@ do_status() {
 
     if ! test -d $BIND_ROOT; then
         echo "  BIND_ROOT: $BIND_ROOT is not a directory"
-    elif mountpoint -q $BIND_ROOT; then
+    elif is_mounted $BIND_ROOT; then
         echo "  BIND_ROOT: $BIND_ROOT is mounted"
     else
         echo "  BIND_ROOT: $BIND_ROOT is not mounted"
@@ -405,7 +434,6 @@ _do_files() {
     write_conf_file $CONF_FILE
 }
 
-
 do_all_files() {
     do_live_files "$@"
     do_general_files "$@"
@@ -433,12 +461,14 @@ do_cleanup() {
 
     local i
     for i in $(seq 1 10); do
-        mountpoint $BIND_ROOT -q &>/dev/null || break
+        is_mounted $BIND_ROOT &>/dev/null || break
         pretend umount --recursive $BIND_ROOT
         [ "$PRETEND" ] && break
     done
 
-    [ -z "$PRETEND" ] && mountpoint $BIND_ROOT -q &>/dev/null && fatal "Could not umount $BIND_DIR"
+    [ -z "$PRETEND" ] && is_mounted $BIND_ROOT &>/dev/null && fatal "Could not umount $BIND_DIR"
+
+    pretend rmdir $BIND_ROOT
 
     local file dir
     echo "$RM_FILES" | tr ',' '\n' | tac | while read file; do
@@ -517,7 +547,7 @@ munge_files() {
     local template_dir=$1  bind_root=$2  work_dir=$3  user_pw=${4:-demo}  root_pw=${5:-root}
     local bind_from=$work_dir/bind
 
-    local def_user=${user_pw%%=*}
+    local def_user=${user_pw%%:*}
 
     local empty_dir=$work_dir/empty
     mkdir -p $empty_dir
@@ -584,6 +614,8 @@ munge_files() {
         pretend sed -i -r -e "s/:$user_1000(,|$)/:$def_user/" -e "s/,$user_1000(,|$)/,$def_user\1/" $grp_files
     fi
 
+    update_home $def_user /home/$def_user $bind_from
+
     set_password $user_pw $bind_from
     set_password $root_pw $bind_from
 
@@ -597,8 +629,10 @@ munge_files() {
     done
 }
 
+# Note: this code is no longer called/used.  We use fresh copies which
+# a lot of problems.  Although we will need to call it if the name of
+# the default user changes.
 do_xorg_login() {
-    #FIXME!
     exit 10
     do_sed $bind_from/etc/slim.conf \
         -e "s/^(\s#)*(default_user +).*/\2$def_user/" \
@@ -638,7 +672,12 @@ set_password() {
     local pw=${user_pw#*:}
     : ${pw:=$user}
     local hash=$(mkpasswd -m sha-512 "$pw")
-    pretend sed -n -r "s=^($user):[^:]*:=\1:$hash=p" $dir/etc/shadow
+    pretend sed -i -r "s=^($user):[^:]*:=\1:$hash:=" $dir/etc/shadow
+}
+
+update_home() {
+    local user=$1  home=$2  dir=$3
+    pretend sed -i -r "s=^($user:[^:]*:[^:]*:[^:]*:[^:]*:)[^:]*=\1$home=" $dir/etc/passwd
 }
 
 write_conf_file() {

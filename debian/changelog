@@ -1,3 +1,24 @@
+mx-remaster (0.1.5mx150+5) mx; urgency=medium
+
+  * installed-to-live fixes distribution live iso failure
+
+ -- anticapitalista <antiX@operamail.com>  Fri, 04 Dec 2015 14:47:00 +0200
+
+
+mx-remaster (0.1.5mx150+4) mx; urgency=medium
+
+  * Bugfix of installed-to-live script
+
+ -- anticapitalista <antiX@operamail.com>  Mon, 16 Nov 2015 15:59:00 +0200
+
+
+mx-remaster (0.1.5mx150+3) mx; urgency=medium
+
+  * Rebuild for MX-15.
+
+ -- Steven Pusser (Stevo) <maintainer@mepiscommunity.org>  Fri, 06 Nov 2015 13:22:33 -0800
+
+
 mx-remaster (0.1.5mx150+2) mx; urgency=low
 
   * Removed halt and reboot symlinks
