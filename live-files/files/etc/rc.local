@@ -21,7 +21,7 @@ restore=/live/etc/init.d/live-restore-services
 # Set up 12 hour clock format for some countries eg US
 /usr/local/bin/clock12or24
 
-# Automatically switch to vt2 when db+ cheat is used
-egrep -q "(^| )db\+( |$)" /proc/cmdline && chvt 2
+# Automatically switch to vt2 when fdb+ cheat is used
+egrep -q "(^| )fdb\+( |$)" /proc/cmdline && chvt 2
 
 exit 0
