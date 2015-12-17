@@ -1,3 +1,10 @@
+mx-remaster (0.1.5mx150+7) mx; urgency=medium
+
+  * updated locales
+
+ -- anticapitalista <antiX@operamail.com>  Thu, 17 Dec 2015 00:16:00 +0200
+
+
 mx-remaster (0.1.5mx150+6) mx; urgency=medium
 
   * Changed rc.local to fdb+ cheat
