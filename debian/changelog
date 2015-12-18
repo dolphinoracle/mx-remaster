@@ -1,3 +1,10 @@
+mx-remaster (0.1.5mx150+8) mx; urgency=medium
+
+  * removed antibashlibs.mo files form locales
+
+ -- anticapitalista <antiX@operamail.com>  Fri, 18 Dec 2015 10:48:00 +0200
+
+
 mx-remaster (0.1.5mx150+7) mx; urgency=medium
 
   * updated locales
