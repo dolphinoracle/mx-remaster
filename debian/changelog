@@ -1,3 +1,11 @@
+mx-remaster (0.1.5mx150+9) mx; urgency=medium
+
+  * Error out early in persist-save if there's no dyanamic root persistence
+  * RC1 bugfixes 
+
+ -- anticapitalista <antiX@operamail.com>  Mon, 21 Dec 2015 17:07:00 +0200
+
+
 mx-remaster (0.1.5mx150+8) mx; urgency=medium
 
   * removed antibashlibs.mo files form locales
