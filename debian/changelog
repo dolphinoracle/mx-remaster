@@ -1,3 +1,9 @@
+mx-remaster (0.1.5mx150+11) mx; urgency=medium
+
+  * removed all alsa-set-default-card.mo files 
+
+ -- anticapitalista <antix@operamail.com>  Sun, 10 Apr 2016 00:13:57 +0300
+
 mx-remaster (0.1.5mx150+10) mx; urgency=medium
 
   * live-remaster changes to stop double yad pop up"
