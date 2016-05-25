@@ -22,5 +22,5 @@ Exec=gksu remastercc.sh
 Icon=preferences-desktop.png
 Terminal=false
 Type=Application
-Categories=System;
+Categories=System;MX-Live;
 NoDisplay=False
