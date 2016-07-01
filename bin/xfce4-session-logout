@@ -19,7 +19,7 @@ esac
 
 PERSIST_SAVE="persist-save"
 PERSIST_SAVE_CONF="/live/config/persist-save.conf"
-CONF_FILE=/etc/live/config/persist-config.conf
+CONF_FILE=/etc/live/persist-config.conf
 
 try_paths="/sbin /bin /usr/sbin /usr/bin"
 
