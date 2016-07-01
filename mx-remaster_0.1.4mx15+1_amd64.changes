@@ -1,0 +1,32 @@
+Format: 1.8
+Date: Mon, 23 May 2016 12:56:39 -0400
+Source: mx-remaster
+Binary: mx-remaster remaster-mx
+Architecture: source all
+Version: 0.1.4mx15+1
+Distribution: mx
+Urgency: medium
+Maintainer: anticapitalista <antiX@operamail.com>
+Changed-By: dolphinoracle <dolphinoracle@gmail.com>
+Description:
+ mx-remaster - Tools for live persistence and remastering.
+ remaster-mx - transitional dummy package for mx-remaster upgrade
+Changes:
+ mx-remaster (0.1.4mx15+1) mx; urgency=medium
+ .
+   * new desktop file
+Checksums-Sha1:
+ 4dcc78a2a56dd6286851f8e39e9ae976b8b3aa80 657 mx-remaster_0.1.4mx15+1.dsc
+ 5a46b6645abf0e8db6d32005ab06ed5088479549 145640 mx-remaster_0.1.4mx15+1.tar.xz
+ 6ede2da13966363132d40f28c6158d6c9c180265 39046 mx-remaster_0.1.4mx15+1_all.deb
+ b16cfe0e41b7e1c71879638934fa1bfadab92081 2232 remaster-mx_0.1.4mx15+1_all.deb
+Checksums-Sha256:
+ f164d3dfdc4c8b85efbe7457ccb2ecd3d45555903c2a20231f304cdc0f9005e4 657 mx-remaster_0.1.4mx15+1.dsc
+ 4d3b8db944fc44ec5f8d32c219f46a33b178981158bac2b54c3b9ed3458b8d3d 145640 mx-remaster_0.1.4mx15+1.tar.xz
+ 7e378d704735168ce5020e816ced6c1ec22bef1d4d5038ea93400ad9b3091020 39046 mx-remaster_0.1.4mx15+1_all.deb
+ e762a31f381c412773a668345291d77a436bcc43931fc468e0fd4e1990569495 2232 remaster-mx_0.1.4mx15+1_all.deb
+Files:
+ 5e2fd83e5aa097cf832262ccac8509fa 657 system required mx-remaster_0.1.4mx15+1.dsc
+ 0b7c33f42aa60e90c335573ddfcc3f2c 145640 system required mx-remaster_0.1.4mx15+1.tar.xz
+ 9714a3fd15ddffbfdf50fe7cba646b8f 39046 system required mx-remaster_0.1.4mx15+1_all.deb
+ bf92539a4ef60147a1a44f7f5e574f76 2232 system required remaster-mx_0.1.4mx15+1_all.deb
