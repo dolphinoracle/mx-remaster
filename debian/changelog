@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+mx-remaster (0.1.5mx150+11) mx; urgency=medium
+=======
 mx-remaster (0.1.4mx15+1) mx; urgency=medium
 
   * new desktop file 
@@ -5,22 +8,89 @@ mx-remaster (0.1.4mx15+1) mx; urgency=medium
  -- dolphinoracle <dolphinoracle@gmail.com>  Mon, 23 May 2016 12:56:39 -0400
 
 mx-remaster (0.1.4mx15) mx; urgency=medium
+>>>>>>> upstream/master
 
-  * changed suffix to just mx15
+  * removed all alsa-set-default-card.mo files 
 
- -- Kent Mathern <maintainer@mepiscommunity.org>  Thu, 11 Jun 2015 22:09:37 -0400
+ -- anticapitalista <antix@operamail.com>  Sun, 10 Apr 2016 00:13:57 +0300
 
-mx-remaster (0.1.4mx150+1) mx; urgency=medium
+mx-remaster (0.1.5mx150+10) mx; urgency=medium
 
-  * repackaged for MX-15
+  * live-remaster changes to stop double yad pop up"
 
- -- Kent Mathern <maintainer@mepiscommunity.org>  Thu, 11 Jun 2015 19:26:53 -0400
+ -- anticapitalista <antiX@operamail.com>  Wed, 23 Dec 2015 21:28:00 +0200
 
-mx-remaster (0.1.4mx140+4) mx; urgency=low
 
-  * update help link 
+mx-remaster (0.1.5mx150+9) mx; urgency=medium
 
- -- Kent Mathern <maintainer@mepiscommunity.org>  Wed, 03 Jun 2015 18:47:50 -0400
+  * Error out early in persist-save if there's no dyanamic root persistence
+  * RC1 bugfixes 
+
+ -- anticapitalista <antiX@operamail.com>  Mon, 21 Dec 2015 17:07:00 +0200
+
+
+mx-remaster (0.1.5mx150+8) mx; urgency=medium
+
+  * removed antibashlibs.mo files form locales
+
+ -- anticapitalista <antiX@operamail.com>  Fri, 18 Dec 2015 10:48:00 +0200
+
+
+mx-remaster (0.1.5mx150+7) mx; urgency=medium
+
+  * updated locales
+
+ -- anticapitalista <antiX@operamail.com>  Thu, 17 Dec 2015 00:16:00 +0200
+
+
+mx-remaster (0.1.5mx150+6) mx; urgency=medium
+
+  * Changed rc.local to fdb+ cheat
+  * Add overlayfs support to persist-save 
+  * changed default bind root to /.bind-root
+  * fixed the is_mounted() function by using readlink -f
+  * adding a 0.1 second delay between tries.
+  * added a new "adjtime" command
+
+ -- anticapitalista <antiX@operamail.com>  Wed, 16 Dec 2015 10:28:00 +0200
+
+
+mx-remaster (0.1.5mx150+5) mx; urgency=medium
+
+  * installed-to-live fixes distribution live iso failure
+
+ -- anticapitalista <antiX@operamail.com>  Fri, 04 Dec 2015 14:47:00 +0200
+
+
+mx-remaster (0.1.5mx150+4) mx; urgency=medium
+
+  * Bugfix of installed-to-live script
+
+ -- anticapitalista <antiX@operamail.com>  Mon, 16 Nov 2015 15:59:00 +0200
+
+
+mx-remaster (0.1.5mx150+3) mx; urgency=medium
+
+  * Rebuild for MX-15.
+
+ -- Steven Pusser (Stevo) <maintainer@mepiscommunity.org>  Fri, 06 Nov 2015 13:22:33 -0800
+
+
+mx-remaster (0.1.5mx150+2) mx; urgency=low
+
+  * Removed halt and reboot symlinks
+  * Fixed xfce4-session-logout formatting
+  * Included correct translations
+
+ -- Kent Mathern <maintainer@mepiscommunity.org>  Thu, 15 Oct 2015 15:11:36 -0400
+
+
+mx-remaster (0.1.5mx150+1) mx; urgency=low
+
+  * update to antiX versions
+
+ -- Kent Mathern <maintainer@mepiscommunity.org>  Fri, 02 Oct 2015 18:06:36 -0400
+
 
 mx-remaster (0.1.4mx140+3) mx; urgency=low
 
