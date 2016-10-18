@@ -1,0 +1,43 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+Format: 1.8
+Date: Tue, 18 Oct 2016 08:43:34 -0400
+Source: mx-remaster
+Binary: mx-remaster
+Architecture: source all
+Version: 0.1.6mx150
+Distribution: mx
+Urgency: medium
+Maintainer: anticapitalista <antiX@operamail.com>
+Changed-By: Adrian <adrian@mxlinux.org>
+Description:
+ mx-remaster - Tools for live persistence and remastering.
+Changes:
+ mx-remaster (0.1.6mx150) mx; urgency=medium
+ .
+   * updated installed-to-live script
+Checksums-Sha1:
+ 584cceb9bf984ba7b07a724ca975c3f68b5b2457 1116 mx-remaster_0.1.6mx150.dsc
+ a5cb298a59e76e50bdb93ffb30d19d8be65389b6 98332 mx-remaster_0.1.6mx150.tar.xz
+ 1ecc321ec8a896ed89e550c3916b1580e4c571df 91744 mx-remaster_0.1.6mx150_all.deb
+Checksums-Sha256:
+ 36540ae4fa2f7db13e6d117e23feed2f7cd31f6da3b9685406521effcd42a0fe 1116 mx-remaster_0.1.6mx150.dsc
+ 5bf11c6177db82925a424413071c107f03579728db8607c94523f6cab571cae4 98332 mx-remaster_0.1.6mx150.tar.xz
+ 4cfc57e6f904afd6a3e327f5f2cbbfc8d089618b02cea4aa7ef0594291f9c1bc 91744 mx-remaster_0.1.6mx150_all.deb
+Files:
+ 65b70c9aacae656c8f7244500e545dc4 1116 system required mx-remaster_0.1.6mx150.dsc
+ b2a140dec25f41e2b50dc2346cf7d63e 98332 system required mx-remaster_0.1.6mx150.tar.xz
+ b7b37c4e595e9c36a4f3e504333a51f0 91744 system required mx-remaster_0.1.6mx150_all.deb
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJYBhkxAAoJEHCTjHgGee6YD1wIALaSWgr9iZJM/0x2+r7/LgbN
+R6mu20tTM/Qf+fD4VY4Qz2Fvtv570wxxMGY4haNZhsXxQNBmJ9PFrIXRurBGJgJJ
+NZaNiISogj7nGyF9cEWR/13gm1VX/bN3am3PIxbga4Nhy8NGQOjqbOw00E3Pogs3
+ApdvUS64W25jAUl0/7HWdt7NbhxXo7xjPkocRPgxKYyljP4maQ4C/tKoTNpKyrae
+3boJFT+9hg8KSglWSkejni+lf9FdEUPLvCU0/lwoD8YZogDLo0WYKVFsM8bYqEYX
+iF7Qai5qDdp4PWFMsvb5Q+7toCd2wXM+iZ27Nql0MpayVDt18xWDZ/gHfMvyC3o=
+=mMFg
+-----END PGP SIGNATURE-----

@@ -1,6 +1,9 @@
-<<<<<<< HEAD
-mx-remaster (0.1.5mx150+11) mx; urgency=medium
-=======
+mx-remaster (0.1.6mx150) mx; urgency=medium
+
+  * updated installed-to-live script
+
+ -- Adrian <adrian@mxlinux.org>  Tue, 18 Oct 2016 08:43:34 -0400
+
 mx-remaster (0.1.4mx15+1) mx; urgency=medium
 
   * new desktop file 
@@ -8,7 +11,6 @@ mx-remaster (0.1.4mx15+1) mx; urgency=medium
  -- dolphinoracle <dolphinoracle@gmail.com>  Mon, 23 May 2016 12:56:39 -0400
 
 mx-remaster (0.1.4mx15) mx; urgency=medium
->>>>>>> upstream/master
 
   * removed all alsa-set-default-card.mo files 
 
