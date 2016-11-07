@@ -1,3 +1,9 @@
+mx-remaster (0.1.7mx150) mx; urgency=medium
+
+  * added /etc/grub.d/* files
+
+ -- Adrian <adrian@mxlinux.org>  Mon, 07 Nov 2016 16:47:28 -0500
+
 mx-remaster (0.1.6mx150+nmu2) mx; urgency=medium
 
   * Updated localisation
