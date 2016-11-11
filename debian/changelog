@@ -1,3 +1,9 @@
+mx-remaster (0.1.7mx150+nmu1) mx; urgency=medium
+
+  * French/Brazilian translations
+
+ -- anticapitalista <antix@operamail.com>  Fri, 11 Nov 2016 13:24:14 +0200
+
 mx-remaster (0.1.7mx150) mx; urgency=medium
 
   * added /etc/grub.d/* files
