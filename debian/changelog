@@ -1,8 +1,15 @@
-mx-remaster (0.1.8mx150) mx; urgency=medium
+mx-remaster (0.1.7.2) mx; urgency=medium
 
   * Added Kazakh
 
  -- anticapitalista <antix@operamail.com>  Thu, 17 Nov 2016 11:57:54 +0200
+
+mx-remaster (0.1.7.1) mx; urgency=medium
+
+  * Bump version up and dump the mx150 and nmu stuff per native version policy.
+  * Clean out debs and build debris from the source before packaging.
+
+ -- Steven Pusser <stevep@mxlinux.org>  Fri, 11 Nov 2016 11:59:57 -0800
 
 mx-remaster (0.1.7mx150+nmu1) mx; urgency=medium
 
