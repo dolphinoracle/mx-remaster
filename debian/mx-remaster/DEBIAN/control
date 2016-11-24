@@ -1,0 +1,12 @@
+Package: mx-remaster
+Version: 0.1.7.2
+Architecture: all
+Maintainer: anticapitalista <antiX@operamail.com>
+Installed-Size: 701
+Depends: mx-antix-libs
+Breaks: remaster-mx
+Replaces: remaster-mx
+Section: system
+Priority: required
+Homepage: http://antix.mepis.org
+Description: Tools for live persistence and remastering.
