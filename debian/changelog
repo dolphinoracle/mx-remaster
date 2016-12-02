@@ -1,3 +1,9 @@
+mx-remaster (0.1.8mx152) mx; urgency=medium
+
+  * Improved Catalan, French and Japanese
+
+ -- anticapitalista <antix@operamail.com>  Fri, 02 Dec 2016 12:25:05 +0200
+
 mx-remaster (0.1.8mx151) unstable; urgency=medium
 
   * Improved kazakh translation
