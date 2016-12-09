@@ -11,4 +11,4 @@ Depends: mx-antix-libs
 Breaks: remaster-mx
 Replaces: remaster-mx
 Architecture: all
-Description: Tools for live persistence and remastering.        
+Description: Tools for live persistence and remastering.

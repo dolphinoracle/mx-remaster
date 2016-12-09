@@ -1,3 +1,16 @@
+mx-remaster (0.1.8.2) mx; urgency=medium
+
+  * Added files to initrd and grub folders 
+
+ -- anticapitalista <antix@operamail.com>  Fri, 09 Dec 2016 23:24:34 +0200
+
+mx-remaster (0.1.8.1) mx; urgency=medium
+
+  * Package for repository.
+  * Bump version and drop the "mx15X" versioning.
+
+ -- Steven Pusser <stevep@mxlinux.org>  Fri, 02 Dec 2016 10:42:24 -0800
+
 mx-remaster (0.1.8mx152) mx; urgency=medium
 
   * Improved Catalan, French and Japanese
@@ -6,7 +19,7 @@ mx-remaster (0.1.8mx152) mx; urgency=medium
 
 mx-remaster (0.1.8mx151) unstable; urgency=medium
 
-  * Improved kazakh translation
+  * Improved Kazakh translation
 
  -- anticapitalista <antix@operamail.com>  Thu, 24 Nov 2016 13:32:58 +0200
 
