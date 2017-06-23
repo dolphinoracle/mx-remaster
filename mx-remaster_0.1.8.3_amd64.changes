@@ -1,0 +1,43 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+Format: 1.8
+Date: Fri, 23 Jun 2017 18:00:22 -0400
+Source: mx-remaster
+Binary: mx-remaster
+Architecture: source all
+Version: 0.1.8.3
+Distribution: mx
+Urgency: medium
+Maintainer: Adrian <adrian@mxlinux.org>
+Changed-By: Adrian <adrian@mxlinux.org>
+Description:
+ mx-remaster - Tools for live persistence and remastering.
+Changes:
+ mx-remaster (0.1.8.3) mx; urgency=medium
+ .
+   * Fix removing files from installed enviroment when using 'general' option
+Checksums-Sha1:
+ 7f0ee24b33bd3a557863f8303e5af1c7087fcd36 1091 mx-remaster_0.1.8.3.dsc
+ c4bd18dd099a29ad5c7b98de46f8a2fcd2f78510 121240 mx-remaster_0.1.8.3.tar.xz
+ 15ddde1aebea75758acb68efefb22f0ee7664fcc 116536 mx-remaster_0.1.8.3_all.deb
+Checksums-Sha256:
+ 4f02ab7a8dfd3a8dfeb9392037dc44ef1d3583d3a94c42bfdab151efbd6061c6 1091 mx-remaster_0.1.8.3.dsc
+ ee957939c23f7a3d63540937f811cb853563366edc61fe973c3dba8324209aea 121240 mx-remaster_0.1.8.3.tar.xz
+ 8af8f7f343590b1a67477b1cb0d9df8919c2ce8ba87a2993f8d5983a286d3c5e 116536 mx-remaster_0.1.8.3_all.deb
+Files:
+ 15f4e29f12a0d5925b0d5b6e3b3f72a2 1091 system required mx-remaster_0.1.8.3.dsc
+ 573595bc0881164c050544bc9f893a2d 121240 system required mx-remaster_0.1.8.3.tar.xz
+ 6707f46e6e0a408bb3e38e1246549678 116536 system required mx-remaster_0.1.8.3_all.deb
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJZTZKzAAoJEHCTjHgGee6YWAoH/3HgBlfBuze+9cc/ncacr/h2
+7+yasec3FX5uCQSKU9pAakFh3XOpY+SZtHbTwlh1A7qoTT9CCO4qRDn6b4p+H2/J
+8iFQbAJ98EkBIEJ6z7rb+bUaqolBMcvowaSZcMKoMZg2weAb7v3Dab3qGPMF15wj
+GiK9DSibndeyAc8lxzy3xUMwhbdwixYEvlu1uqEWbtSK8E5RhdVkVZ6xIx8K260Y
+n3pGqux0ZBGPZ5QKNjt6FkHQwsu2gj94RR9+AxRnovjm3yhpR8Tf/AmcNEPtDCYD
+o6OCJ33NxFTil+Amnp+4ttb+giFxjjzjb87ODgUGk20RDD+X9UGAxxhS6fqCZrw=
+=HTvz
+-----END PGP SIGNATURE-----
