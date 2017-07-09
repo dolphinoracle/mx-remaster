@@ -1,3 +1,9 @@
+mx-remaster (0.1.8.4) mx; urgency=medium
+
+  * Updated installed-to-live script
+
+ -- Adrian <adrian@mxlinux.org>  Sun, 09 Jul 2017 15:52:13 -0400
+
 mx-remaster (0.1.8.3) mx; urgency=medium
 
   * Fix removing files from installed enviroment when using 'general' option 
