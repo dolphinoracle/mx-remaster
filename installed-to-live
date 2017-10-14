@@ -51,7 +51,6 @@ LIVE_FILE_LIST="
 /etc/init.d/debian/*
 /etc/init.d/gpm
 /etc/init.d/hwclock.sh
-/etc/init.d/keyboard-setup
 /etc/init.d/keyboard-setup.sh
 /etc/init.d/console-setup.sh
 /etc/init.d/sendsigs
@@ -64,21 +63,31 @@ LIVE_FILE_LIST="
 /etc/skel/.jwm/menu
 /etc/skel/Desktop/Installer.desktop
 /etc/udev/rules.d/90-fstab-automount.rules
-/etc/udev/rules.d/92-console-font.rules
+/lib/udev/rules.d/92-console-font.rules
 /usr/share/applications/mx/minstall.desktop
+/usr/share/applications/antix/minstall.desktop
+/usr/share/applications/antix/antixsources.desktop
+/usr/share/applications/antix/persist-config.desktop
+/usr/share/applications/antix/persist_setup.desktop 
+/usr/share/applications/antix/persist_save.desktop
+/usr/share/applications/antix/remaster.desktop
 "
 
 GENERAL_LIVE_FILE_LIST="
 /etc/adjtime
-/etc/default/console-setup
-/etc/default/grub
-/etc/default/keyboard
-/etc/default/locale
+/etc/default/*
+/etc/dhcp/dhclient.conf
+/etc/dnsmasq.conf
 /etc/hostname
+/etc/init.d/ifplugd
+/etc/init.d/networking
 /etc/kbd/config
 /etc/lightdm/lightdm.conf
 /etc/modprobe.d/*
+/etc/network/interfaces
+/etc/network/interfaces.d/*
 /etc/slim.conf
+/lib/udev/ifupdown-hotplug
 "
 
 usage() {
@@ -111,6 +120,7 @@ Commands:
     bind=<dir1,dir2,..>  Bind mount each dir IF it is a mountpoint
 
     general             Same as "empty=/etc/modprobe.d/ empty=/etc/grub.d
+                        empty=/etc/network/interfaces.d/
                         all-files passwd repo timezone"
 
     adjtime             Reset the adjtime file but leave the utc / local selection
@@ -550,6 +560,7 @@ do_general() {
 
     do_empty     $conf_file $work_dir "/etc/modprobe.d"
     do_empty     $conf_file $work_dir "/etc/grub.d"
+    do_empty     $conf_file $work_dir "/etc/network/interfaces.d"
     do_all_files $conf_file $work_dir
     do_passwd    $conf_file
     do_repo      $conf_file $work_dir $DEF_REPO
