@@ -1,3 +1,9 @@
+mx-remaster (0.1.9.3) mx; urgency=medium
+
+  * update to latest antiX remaster scripts (fix for crash-hang on some systems)
+
+ -- Dolphin <dolphinoracle@gmail.com>  Tue, 14 Nov 2017 21:07:34 -0400
+
 mx-remaster (0.1.9.2) mx; urgency=medium
 
   * update to latest antiX remaster scripts (localtime now a symlink again)
