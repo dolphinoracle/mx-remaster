@@ -18,9 +18,6 @@ restore=/live/etc/init.d/live-restore-services
 # Detect and set up correct broadcom
 /usr/local/bin/BroadcomStartup
 
-# localize thunar custom actions
-/usr/local/bin/thunar_custom_actions_localize
-
 # Set up 12 hour clock format for some countries eg US
 /usr/local/bin/clock12or24
 
