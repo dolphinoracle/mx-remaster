@@ -1,8 +1,8 @@
-mx-remaster (18.11.01) mx; urgency=medium
+mx-remaster (18.11.02) mx; urgency=medium
 
-  * update 30_firmware file 
+  * update grub config files (30_firmware and others) 
 
- -- dolphin <dolphin@littlebyte>  Mon, 12 Nov 2018 20:48:59 -0500
+ -- dolphin <dolphin@littlebyte>  Wed, 14 Nov 2018 21:18:01 -0500
 
 mx-remaster (0.1.9.5) mx; urgency=medium
 
