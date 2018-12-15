@@ -1,3 +1,9 @@
+mx-remaster (18.12.01) mx; urgency=medium
+
+  * memtest fix 
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Sat, 15 Dec 2018 10:15:16 -0500
+
 mx-remaster (18.11.02) mx; urgency=medium
 
   * update grub config files (30_firmware and others) 
