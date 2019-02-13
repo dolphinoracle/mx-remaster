@@ -1,3 +1,9 @@
+mx-remaster (19.04.01) mx; urgency=medium
+
+  * persist-config dialog switch for systemd 
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Tue, 12 Feb 2019 20:49:32 -0500
+
 mx-remaster (19.02.01) mx; urgency=medium
 
   * revised installed-to-live 
