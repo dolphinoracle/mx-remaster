@@ -1,3 +1,9 @@
+mx-remaster (19.02.01) mx; urgency=medium
+
+  * revised installed-to-live 
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Tue, 12 Feb 2019 20:35:39 -0500
+
 mx-remaster (18.12.01) mx; urgency=medium
 
   * memtest fix 
