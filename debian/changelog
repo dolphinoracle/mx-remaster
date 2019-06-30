@@ -1,3 +1,9 @@
+mx-remaster (19.06.01) mx; urgency=medium
+
+  * update installed-to-live (antiX upstream) 
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Sun, 30 Jun 2019 16:56:09 -0400
+
 mx-remaster (19.04.01) mx; urgency=medium
 
   * update (antiX-buster) 
