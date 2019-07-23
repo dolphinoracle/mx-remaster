@@ -1,3 +1,9 @@
+mx-remaster (19.07.06) mx; urgency=medium
+
+  * revised rc.local 
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Mon, 22 Jul 2019 21:43:03 -0400
+
 mx-remaster (19.07.05) mx; urgency=medium
 
   * remove xfce4-session-logout bypass 
