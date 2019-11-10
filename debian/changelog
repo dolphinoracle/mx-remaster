@@ -1,3 +1,9 @@
+mx-remaster (19.07.07) mx; urgency=medium
+
+  * update persist-config to limit accepted commands 
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Sun, 10 Nov 2019 16:06:13 -0500
+
 mx-remaster (19.07.06) mx; urgency=medium
 
   * revised rc.local 
