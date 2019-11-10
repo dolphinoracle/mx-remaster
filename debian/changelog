@@ -1,4 +1,4 @@
-mx-remaster (19.07.07) mx; urgency=medium
+mx-remaster (19.11.01) mx; urgency=medium
 
   * update persist-config to limit accepted commands (BitJam)
 
