@@ -242,7 +242,7 @@ check_persist_uuid() {
         else
             local try max_try=3 fail
             for try in $(seq 1 $max_try); do
-                get_text title ""                                         \
+                get_password "" ""                                         \
                 $"Encrypted live-usb detected"                            \
                 ""                                                        \
                 $"Be sure to set the keyboard layout to English"          \
@@ -254,7 +254,8 @@ check_persist_uuid() {
 
                 fail=
 
-                echo "$UI_RESULT" |  cryptsetup open --type luks $crypt_dev $crypt_name --key-file - && break
+                #echo "$UI_RESULT" |  cryptsetup open --type luks $crypt_dev $crypt_name --key-file - && break
+                printf "$UI_RESULT" |  cryptsetup open --type luks $crypt_dev $crypt_name -d - && break
 
                 fail=true
 
