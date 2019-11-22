@@ -1,3 +1,15 @@
+mx-remaster (19.11.03) mx; urgency=medium
+
+  * new init-scripts 
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Thu, 21 Nov 2019 18:19:57 -0500
+
+mx-remaster (19.11.02+1) mx; urgency=medium
+
+  *  persist-config (again)
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Mon, 18 Nov 2019 20:41:37 -0500
+
 mx-remaster (19.11.02) mx; urgency=medium
 
   * persist-save encryption fixes (fehlix antix-upstream)
