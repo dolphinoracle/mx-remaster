@@ -1,3 +1,9 @@
+mx-remaster (20.01.01) mx; urgency=medium
+
+  * update 20_memetest86+ file
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Sun, 05 Jan 2020 21:20:19 -0500
+
 mx-remaster (19.11.04) mx; urgency=medium
 
   * update grub files 
