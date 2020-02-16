@@ -1,4 +1,4 @@
-Source: mx-remaster
+Source: mx-remaster-systemd
 Section: system
 Priority: required
 Maintainer: Adrian <adrian@mxlinux.org>
@@ -7,7 +7,8 @@ Standards-Version: 3.9.4
 Homepage: http://mepis.org
 
 Package: mx-remaster
-Depends: mx-antix-libs
+Provides: mx-remaster
+Depends: antix-libs
 Breaks: remaster-mx
 Replaces: remaster-mx
 Architecture: all
