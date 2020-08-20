@@ -1,3 +1,9 @@
+mx-remaster (20.08.01) mx; urgency=medium
+
+  * add sddm.conf to default live files list
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Wed, 19 Aug 2020 21:24:59 -0400
+
 mx-remaster (20.05.01) mx; urgency=medium
 
   * update 20_memtest86+ file (troublemaker) 
