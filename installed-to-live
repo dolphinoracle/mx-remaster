@@ -64,6 +64,7 @@ LIVE_FILE_LIST="
 /etc/skel/.icewm/menu
 /etc/skel/.jwm/menu
 /etc/skel/Desktop/Installer.desktop
+/etc/skel/.idesktop/gazelle.lnk
 /etc/udev/rules.d/90-fstab-automount.rules
 /lib/udev/rules.d/92-console-font.rules
 /usr/share/applications/mx/minstall.desktop

@@ -1,3 +1,9 @@
+mx-remaster (20.11.01) mx; urgency=medium
+
+  * pick up installer idesk link file
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Fri, 27 Nov 2020 14:17:07 -0500
+
 mx-remaster (20.08.01) mx; urgency=medium
 
   * add sddm.conf to default live files list
