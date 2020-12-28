@@ -1,3 +1,9 @@
+mx-remaster (20.12.01) mx; urgency=medium
+
+  * add "whois" as a depend, localize-repo as a recommend 
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Mon, 28 Dec 2020 16:08:07 -0500
+
 mx-remaster (20.11.01) mx; urgency=medium
 
   * pick up installer idesk link file
