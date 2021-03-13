@@ -1,3 +1,9 @@
+mx-remaster (20.03.01mx21) mx; urgency=medium
+
+  * move live files out of script into package 
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Sat, 13 Mar 2021 12:37:39 -0500
+
 mx-remaster (20.12.01) mx; urgency=medium
 
   * add "whois" as a depend, localize-repo as a recommend 
