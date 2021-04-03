@@ -1,5 +1,12 @@
 #! /bin/sh
+
+#tag for mx-system update
+#mx-system 20.11.02
+
+export LVM_SUPPRESS_FD_WARNINGS=true
+
 set -e
+
 
 # grub-mkconfig helper script.
 # Copyright (C) 2006,2007,2008,2009  Free Software Foundation, Inc.
