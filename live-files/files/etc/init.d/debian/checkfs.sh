@@ -91,7 +91,7 @@ Continuing with system boot in 5 seconds."
 		if [ "$VERBOSE" = no ]
 		then
 			log_action_begin_msg "Checking file systems"
-			logsave -s $FSCK_LOGFILE fsck $spinner -M -A $fix $force $FSCKTYPES_OPT
+			logsave_best_effort fsck $spinner -M -A $fix $force $FSCKTYPES_OPT
 			FSCKCODE=$?
 
 			if [ "$FSCKCODE" -eq 32 ]
@@ -112,7 +112,7 @@ Continuing with system boot in 5 seconds."
 			else
 				log_action_msg "Will now check all file systems"
 			fi
-			logsave -s $FSCK_LOGFILE fsck $spinner -V -M -A $fix $force $FSCKTYPES_OPT
+			logsave_best_effort fsck $spinner -V -M -A $fix $force $FSCKTYPES_OPT
 			FSCKCODE=$?
 			if [ "$FSCKCODE" -eq 32 ]
 			then

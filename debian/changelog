@@ -1,3 +1,9 @@
+mx-remaster (21.06.01mx21) mx; urgency=medium
+
+  * update to latest init scripts, live-grubsave 
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Mon, 28 Jun 2021 20:30:43 -0400
+
 mx-remaster (21.04.03mx21) mx; urgency=medium
 
   * rt kernel changes 

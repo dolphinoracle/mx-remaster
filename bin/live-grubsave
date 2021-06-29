@@ -1,0 +1,149 @@
+#!/bin/bash
+
+# live-grubsave - script to save certain bootparameter into grubenv
+
+VERSION="210628-1"
+
+live_grubsave() {
+
+    local config_dir=/live/config
+    local config=$config_dir/initrd.out
+
+    [ -e $config                  ] || return # not a live system
+    [ -e $config_dir/remasterable ] || return # not remasterable 
+
+    local pcl par p
+    local par=(  # boot parameter to save (as par=value pair)
+        lang
+        kbd kbvar kbopt
+        tz
+        from
+        hwclock
+        splasht
+        blab  blabel bootlabel
+        bdev  bootdev
+        bdir  bootdir
+        buuid bootuuid
+        plab  plabel persistlabel
+        pdev  persistdev
+        puuid persistuuid
+        pdir  persistdir
+        live_swap
+        automount fstab
+        desktop desktheme fontsize
+        kernel
+        )
+    local flg=(  # boot parameter as flags
+        toram
+        disable_theme
+        disable_background
+        dostore
+        nostore
+        norepo
+        )
+    local per=(  # boot persistence parameter
+        persist_all
+        persist_root
+        persist_static
+        p_static_root
+        persist_home
+        frugal_persist
+        frugal_root
+        frugal_static
+        f_static_root
+        frugal_home
+        frugal_only
+    )
+    local -A FLG  # hash of to be saved flag-parameter
+    local -A PAR  # hash of to be saved parameter (with par=value)
+    local -A PER  # hash of to be saved persistence parameter
+    local -A GRP  # hash of found parameter
+
+    local c p
+    for p in "${flg[@]}"; do FLG["$p"]="true"; done
+    for p in "${par[@]}"; do PAR["$p"]="$p"; done
+    for p in "${per[@]}"; do PER["$p"]="$p"; done
+
+    local is_mp=true  # no toram
+    for c in $(cat /proc/cmdline $config_dir/cmdline* 2>/dev/null); do
+        p="${c%%=*}"
+        if [ -n "${FLG[$p]}" ]; then
+           #echo GRP[$p]="${FLG[$p]}"
+           GRP[$p]="${FLG[$p]}"
+        fi
+        if [ -n "${PAR[$p]}" ]; then
+           #echo GRP[$p]="${c##*=}"
+           GRP[$p]="${c##*=}"
+        fi
+        if [ -n "${PER[$p]}" ]; then
+            #echo GRP[persistence]="${p}"
+            GRP[persistence]="${p}"
+        fi
+    done
+
+    local BIOS_DEV  BIOS_FSTYPE BIOS_MP BIOS_UUID
+    local BOOT_DEV  BOOT_FSTYPE BOOT_MP BOOT_UUID
+    local GRUB_DEV  GRUB_FSTYPE GRUB_MP GRUB_UUID
+    local is_mounted
+
+    eval "$(grep -E '^(BIOS|BOOT)_(DEV|FSTYPE|MP|UUID)=' $config)"
+
+    if [ -n "$BIOS_UUID" ]; then
+              GRUB_MP=$BIOS_MP
+             GRUB_DEV=$BIOS_DEV
+            GRUB_UUID=$BIOS_UUID
+    else
+              GRUB_MP=$BOOT_MP
+             GRUB_DEV=$BOOT_DEV
+            GRUB_UUID=$BOOT_UUID
+    fi
+    
+    [ -n "$GRUB_MP"   ] || return
+    [ -n "$GRUB_DEV"  ] || return
+    [ -n "$GRUB_UUID" ] || return
+    
+    local grub_dev=$(blkid -U "$GRUB_UUID")
+    
+    if [ x"$GRUB_DEV" != x"$grub_dev" ]; then
+       GRUB_DEV=$grub_dev
+    fi
+    
+    local have_grub_mp=$(lsblk -no MOUNTPOINT $GRUB_DEV)
+    
+    [ -n "$have_grub_mp" ] && GRUB_MP=$have_grub_mp
+
+    if ! mountpoint -q $GRUB_MP; then # toram was used
+       GRUB_FSTYPE=$(blkid -o value -s TYPE $GRUB_DEV)
+       [ -n "$GRUB_FSTYPE" ]                    || return 1
+       mount -t $GRUB_FSTYPE $GRUB_DEV $GRUB_MP || return 1
+    fi
+    local grub_config="/boot/grub/config"
+    local grub_env="/boot/grub/grubenv.cfg"
+
+    if [ -e $GRUB_MP$grub_config ]; then # have live config
+       grub_env="${GRUB_MP}${grub_env}"
+       local grub_head=""
+
+       read grub_head <<EOF
+#GRUB parameter saved on live system by live-grubsave (version "$VERSION") 
+#
+EOF
+
+        if (( ${#GRP[@]} >= 1 )) && touch ${grub_env} 2>/dev/null ; then
+            echo "$grub_head" > ${grub_env}
+            for p in $( printf "%s\n" ${!GRP[@]} | sort ) ; do
+                echo $p='"'"${GRP[$p]}"'"' >> ${grub_env}
+            done
+        fi
+        echo ${grub_env}
+        cat ${grub_env}
+        sync; sync
+    fi
+    if [ -z "$have_grub_mp" ]; then
+        mountpoint -q $GRUB_MP && umount $GRUB_MP
+    fi
+}
+
+live_grubsave
+
+exit $?

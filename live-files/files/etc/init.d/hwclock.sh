@@ -70,7 +70,7 @@ hwclocksh()
 		log_action_msg "Setting the system clock"
 
 		# Just for reporting.
-		if head -n 3 /etc/adjtime | tail -n 1 | grep -q '^UTC$' ; then
+		if sed '3!d' /etc/adjtime | grep -q '^UTC$'; then
 		    UTC="--utc"
 		else
 		    UTC=
@@ -101,7 +101,7 @@ hwclocksh()
 		verbose_log_action_msg "Not setting hardware clock on Live system"
 		exit 0
 	    fi
-	
+
 	    if [ "$HWCLOCKACCESS" != no ]; then
 		log_action_msg "Saving the system clock"
 		if /sbin/hwclock --rtc=/dev/$HCTOSYS_DEVICE --systohc $HWCLOCKPARS $BADYEAR; then
