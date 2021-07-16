@@ -1,8 +1,16 @@
 #!/bin/bash
+VERSION="210716-2"
+# usage
+[  "${1+${1/-*/help}}" == "help" ] && cat<<'USAGE' && exit
 
-# live-grubsave - script to save certain bootparameter into grubenv
+live-grubsave - script to save certain live boot parameter into grubenv
 
-VERSION="210628-1"
+    usage:      live-grubsave [additonal parameter ...]
+
+USAGE
+
+# run_me_as_root
+[ $(id -u) -eq 0 ] || exec sudo "$0" "$@"
 
 live_grubsave() {
 
@@ -10,7 +18,7 @@ live_grubsave() {
     local config=$config_dir/initrd.out
 
     [ -e $config                  ] || return # not a live system
-    [ -e $config_dir/remasterable ] || return # not remasterable 
+    [ -e $config_dir/remasterable ] || return # not remasterable
 
     local pcl par p
     local par=(  # boot parameter to save (as par=value pair)
@@ -54,32 +62,56 @@ live_grubsave() {
         frugal_home
         frugal_only
     )
+    local ign=(  # boot parameter to be ignored - not to be saved
+        BOOT_IMAGE
+        gfxsave
+        grubsave
+        quiet
+        nosplash
+    )
     local -A FLG  # hash of to be saved flag-parameter
     local -A PAR  # hash of to be saved parameter (with par=value)
     local -A PER  # hash of to be saved persistence parameter
     local -A GRP  # hash of found parameter
+    local -A IGN  # hash of to be ignored parameter
+    local -a XTR  # list of found extra parameter
+    local -A CNT  # hash of parameter counter
 
     local c p
     for p in "${flg[@]}"; do FLG["$p"]="true"; done
     for p in "${par[@]}"; do PAR["$p"]="$p"; done
     for p in "${per[@]}"; do PER["$p"]="$p"; done
+    for p in "${ign[@]}"; do IGN["$p"]="$p"; done
 
     local is_mp=true  # no toram
-    for c in $(cat /proc/cmdline $config_dir/cmdline* 2>/dev/null); do
+    for c in $(cat /proc/cmdline $config_dir/cmdline* 2>/dev/null) "$@"; do
         p="${c%%=*}"
+        if [ -n "${IGN[$p]}" ]; then
+           continue
+        fi
+        ((CNT[$p]+=1))
         if [ -n "${FLG[$p]}" ]; then
            #echo GRP[$p]="${FLG[$p]}"
            GRP[$p]="${FLG[$p]}"
+           continue
         fi
         if [ -n "${PAR[$p]}" ]; then
            #echo GRP[$p]="${c##*=}"
            GRP[$p]="${c##*=}"
+           continue
         fi
         if [ -n "${PER[$p]}" ]; then
             #echo GRP[persistence]="${p}"
             GRP[persistence]="${p}"
+           continue
         fi
+        if [ "$p" == extra ]; then
+            GRP[extra]=${c#extra=}
+           continue
+        fi
+        XTR+=($c)
     done
+    (( ${#XTR[*]} >= 1 )) && GRP[extra]="${XTR[*]} ${GRP[extra]}"
 
     local BIOS_DEV  BIOS_FSTYPE BIOS_MP BIOS_UUID
     local BOOT_DEV  BOOT_FSTYPE BOOT_MP BOOT_UUID
@@ -97,19 +129,19 @@ live_grubsave() {
              GRUB_DEV=$BOOT_DEV
             GRUB_UUID=$BOOT_UUID
     fi
-    
+
     [ -n "$GRUB_MP"   ] || return
     [ -n "$GRUB_DEV"  ] || return
     [ -n "$GRUB_UUID" ] || return
-    
+
     local grub_dev=$(blkid -U "$GRUB_UUID")
-    
+
     if [ x"$GRUB_DEV" != x"$grub_dev" ]; then
        GRUB_DEV=$grub_dev
     fi
-    
+
     local have_grub_mp=$(lsblk -no MOUNTPOINT $GRUB_DEV)
-    
+
     [ -n "$have_grub_mp" ] && GRUB_MP=$have_grub_mp
 
     if ! mountpoint -q $GRUB_MP; then # toram was used
@@ -125,16 +157,21 @@ live_grubsave() {
        local grub_head=""
 
        read grub_head <<EOF
-#GRUB parameter saved on live system by live-grubsave (version "$VERSION") 
+#GRUB parameter saved on live system by live-grubsave (version "$VERSION")
 #
 EOF
 
         if (( ${#GRP[@]} >= 1 )) && touch ${grub_env} 2>/dev/null ; then
             echo "$grub_head" > ${grub_env}
             for p in $( printf "%s\n" ${!GRP[@]} | sort ) ; do
+                [ $p == extra ] && continue
+                [ $p == splasht ] && (( CNT[$p] == 1 )) && continue
                 echo $p='"'"${GRP[$p]}"'"' >> ${grub_env}
             done
+            p=extra
+            [ -n "${GRP[$p]}" ] && echo $p='"'"${GRP[$p]}"'"' >> ${grub_env}
         fi
+		#echo $(cat /proc/cmdline $config_dir/cmdline* 2>/dev/null) "$@"
         echo ${grub_env}
         cat ${grub_env}
         sync; sync
@@ -144,6 +181,6 @@ EOF
     fi
 }
 
-live_grubsave
+live_grubsave "$@"
 
 exit $?
