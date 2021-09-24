@@ -1,3 +1,9 @@
+mx-remaster (21.09.01mx21) mx; urgency=medium
+
+  * move some default files around
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Thu, 23 Sep 2021 23:06:15 -0400
+
 mx-remaster (21.08.01mx21) mx; urgency=medium
 
   * update live-grubsave features (fehlix) 
