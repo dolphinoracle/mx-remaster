@@ -1,3 +1,9 @@
+mx-remaster (21.10.01mx21) mx; urgency=medium
+
+  * remove default keyboard  
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Thu, 07 Oct 2021 23:19:56 -0400
+
 mx-remaster (21.09.01mx21) mx; urgency=medium
 
   * move some default files around
