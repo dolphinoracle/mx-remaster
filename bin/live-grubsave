@@ -4,7 +4,7 @@
 [ -z "$BASH_VERSION" ] && exec "$0" "$@"
 
 ME="$0"
-VERSION="210820-01"
+VERSION="211010-01"
 
 # PATH sanity
 PATH=/usr/local/bin:/usr/bin:/usr/sbin
@@ -43,7 +43,7 @@ check_parameter() {
         case $p in
             -h|--help) usage
             ;;
-            -l|--list) list_tables
+            -l|--list) list_tables; exit 
             ;;
             -m|--mount) KEEP_MOUNTED=true; p=
             ;;
