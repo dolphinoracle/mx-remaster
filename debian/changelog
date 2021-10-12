@@ -1,6 +1,7 @@
 mx-remaster (21.10.02mx21) mx; urgency=medium
 
   * update live-grubsave
+  * generate machine-id with /etc/rc.local
 
  -- fehlix <fehlix@mxlinux.org>  Mon, 11 Oct 2021 13:22:47 +0000
 
