@@ -1,9 +1,3 @@
-mx-remaster (21.11.01mx21) mx; urgency=medium
-
-  * update hwclock 
-
- -- Dolphin Oracle <dolphinoracle@gmail.com>  Fri, 26 Nov 2021 19:56:52 -0500
-
 mx-remaster (21.10.02mx21) mx; urgency=medium
 
   * update live-grubsave

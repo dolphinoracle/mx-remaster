@@ -15,10 +15,6 @@
 #                  the UTC setting in /etc/default/rcS.  Additionally
 #                  source /etc/default/hwclock to permit configuration.
 
-# WARNING:	Please read /usr/share/doc/util-linux/README.Debian.hwclock
-#		before changing this file. You risk serious clock
-#		misbehaviour otherwise.
-
 ### BEGIN INIT INFO
 # Provides:          hwclock
 # Required-Start:    mountdevsubfs
@@ -27,6 +23,7 @@
 # Default-Start:     S
 # X-Start-Before:    checkroot
 # Default-Stop:      0 6
+# Short-Description: Sync hardware and system clock time.
 ### END INIT INFO
 
 # These defaults are user-overridable in /etc/default/hwclock
@@ -97,9 +94,9 @@ hwclocksh()
 	    #          clock will not be carried across reboots.
 	    #
 
-	    if [ -d "/live/aufs" ]; then
-			verbose_log_action_msg "Not setting hardware clock on Live system"
-			exit 0
+	    if mountpoint -q /live/aufs; then
+		verbose_log_action_msg "Not setting hardware clock on Live system"
+		exit 0
 	    fi
 
 	    if [ "$HWCLOCKACCESS" != no ]; then
