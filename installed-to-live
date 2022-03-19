@@ -45,6 +45,9 @@ BIND_FILES="$PW_FILES"
 LIVE_FILE_LIST="
 /etc/desktop-session/startup
 /etc/fstab
+/etc/systemd/*
+/etc/systemd/system-generators/systemd-fstab-generator
+/etc/systemd/system-generators/systemd-gpt-auto-generator
 /etc/grub.d/*
 /etc/init.d/checkfs.sh
 /etc/init.d/console-setup.sh

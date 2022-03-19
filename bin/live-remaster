@@ -473,7 +473,7 @@ Version_Info_End
         done
 
     else
-        $MKSQ_COMMAND
+    	$MKSQ_COMMAND
         finish_remaster
     fi
 
