@@ -48,6 +48,9 @@ LIVE_FILE_LIST="
 /etc/systemd/*
 /etc/systemd/system-generators/systemd-fstab-generator
 /etc/systemd/system-generators/systemd-gpt-auto-generator
+/etc/systemd/system/wpa_supplicant@.service
+/etc/systemd/system/wpa_supplicant-nl80211@.service
+/etc/systemd/system/wpa_supplicant-wired@.service
 /etc/grub.d/*
 /etc/init.d/checkfs.sh
 /etc/init.d/console-setup.sh
