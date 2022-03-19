@@ -10,15 +10,6 @@
 file="$1"
 shift
 
-output="/tmp/mksquash_output"
-
-mksquashfs "$@" |tee $output
+mksquashfs "$@"
 ret="$?"
 echo $ret > $file
-
-#also capture uncompressed filesystem output into a variable and place that in a file in the SQFILE_DIR location
-. /live/config/initrd.out
-UNCOMPRESSEDSIZE_FILE="$SQFILE_DIR/linuxfs.info"
-UNCOMPRESSEDSIZE=$(grep "uncompressed filesystem" "$output" | cut -d"(" -f2 | cut -d" " -f1) 
-echo "UncompressedSizeKB=$UNCOMPRESSEDSIZE">"$UNCOMPRESSEDSIZE_FILE"
-rm -f $output 
