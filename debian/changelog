@@ -1,3 +1,9 @@
+mx-remaster (22.04.01mx21) mx; urgency=medium
+
+  * remove slim.conf (mx)
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Sat, 02 Apr 2022 10:19:08 -0400
+
 mx-remaster (22.03.03mx21) mx; urgency=medium
 
   * systemd support for those that remove systemd-shim (rough) 
