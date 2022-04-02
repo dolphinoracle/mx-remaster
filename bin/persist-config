@@ -32,6 +32,14 @@ BLURB="
     1) [b]$_Automatic_[/] ($(gt "at shutdown/reboot, no asking"))
     2) [b]$_Semi_Automatic_[/] ($(gt "ask at shutdown/reboot"))
     3) [b]$_Manual_[/] ($(gt "you snooze, you lose"))"
+    
+if [ -e /live/config/systemd ]; then
+    BLURB="
+    $(gt "Configure root persistence saves to run either:")
+
+    1) [b]$_Automatic_[/] ($(gt "at shutdown/reboot, no asking"))
+    3) [b]$_Manual_[/] ($(gt "you snooze, you lose"))"
+fi
 
 A="$(pfgt "This program should be called with the %s option in a startup script to ensure a config file is created."\
     "[p]--startup[/]")"
