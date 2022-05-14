@@ -78,7 +78,7 @@ case $OPT_COMMAND in
                          "")                             ;;
         reboot|/sbin/reboot)  OPT_COMMAND=/sbin/reboot   ;;
     poweroff|/sbin/poweroff)  OPT_COMMAND=/sbin/poweroff ;;
-                          *)  error_box_pf "This script can only run the commands %s and %s" 'shutdown' 'reboot' ;;
+                          *)  error_box_pf "This script can only run the commands %s and %s" 'poweroff' 'reboot' ;;
 esac
 
 #show_cli_title
