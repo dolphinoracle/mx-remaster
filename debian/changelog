@@ -1,3 +1,13 @@
+mx-remaster (22.11.01mx21) mx; urgency=medium
+
+  [fehlix]
+  * update installed-to-live to deal with more than two users
+
+  [dolphin]
+  * update control file depends to include perl-base
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Sun, 06 Nov 2022 20:15:37 -0500
+
 mx-remaster (22.05.01mx21) mx; urgency=medium
 
   * edit error text on "shutdown" or "reboot" command for --shutdown

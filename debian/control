@@ -7,7 +7,7 @@ Standards-Version: 3.9.4
 Homepage: http://mepis.org
 
 Package: mx-remaster
-Depends: antix-libs, whois
+Depends: antix-libs, whois, perl-base
 Recommends:  localize-repo
 Breaks: remaster-mx
 Replaces: remaster-mx
