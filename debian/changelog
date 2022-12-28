@@ -1,3 +1,11 @@
+mx-remaster (22.12.01mx21) mx; urgency=medium
+
+  [fehlix]
+  * live-grubsave adjustment for some paramter and also ignore builit-in kernel parameter
+  * perists-makefs to als label rootfs/homefs properly
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Tue, 27 Dec 2022 21:06:00 -0500
+
 mx-remaster (22.11.01mx21) mx; urgency=medium
 
   [fehlix]
