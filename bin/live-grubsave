@@ -4,7 +4,7 @@
 [ -z "$BASH_VERSION" ] && exec "$0" "$@"
 
 ME="$0"
-VERSION="211010-01"
+VERSION="221228-01"
 
 # PATH sanity
 PATH=/usr/local/bin:/usr/bin:/usr/sbin
@@ -22,13 +22,15 @@ Options:
 
     -l|--list         Display list of recognised boot parameter
 
+    -m|--mount        Keep grub-device mounted even if toram was used
+
     -p|--print        Print current grubenv.cfg
+
+    -r|--reset        Remove saved boot parameter
 
     -s|--simulate     Do not save, but show what would be saved
 
     -v|--version      Show version
-
-    -m|--mount        Keep grub-device mounted even if toram was used
 
 USAGE
 exit 1
@@ -43,13 +45,15 @@ check_parameter() {
         case $p in
             -h|--help) usage
             ;;
-            -l|--list) list_tables; exit 
+            -l|--list) list_tables; exit
             ;;
             -m|--mount) KEEP_MOUNTED=true; p=
             ;;
-            -s|--simulate) SIMULATE=true; p=
-            ;;
             -p|--print) PRINT_CURRENT=true
+            ;;
+            -r|--reset) RESET=true
+            ;;
+            -s|--simulate) SIMULATE=true; p=
             ;;
             -v|--version) show_version
             ;;
@@ -66,8 +70,11 @@ check_parameter() {
 #----------------------------------------------------------------------
 export KEEP_MOUNTED=""
 export PRINT_CURRENT=""
+export RESET=""
 export SIMULATE=""
 
+
+unset CLP FLG IGN PAR PER TAG CFG
 
 declare -a CLP  # list of command line parameter and options
 declare -A FLG  # hash of to be saved flag-parameter
@@ -75,6 +82,7 @@ declare -A IGN  # hash of to be ignored parameter
 declare -A PAR  # hash of to be saved parameter (with par=value)
 declare -A PER  # hash of to be saved persistence parameter
 declare -A TAG  # hash of grubenv tag fields
+declare -A CFG  # hash of built-in kernel boot parameter
 
 #----------------------------------------------------------------------
 list_tables() {
@@ -85,10 +93,14 @@ list_tables() {
     printf '\t%-20s%s\n' $(printf ' %s=' "${par[@]}")
     echo 'Boot parameter as »flag«'
     printf '\t%-20s%s\n' "${flg[@]}"
+    echo "Tag fields saved in grubenv.cfg"
+    printf '\t%-20s%s\n' "${tag[@]}"
     echo "Parameter ignored - not to be saved"
     printf '\t%-20s%s\n' "${ign[@]}"
-    echo "Tag fields saved in grubenb.cfg"
-    printf '\t%-20s%s\n' "${tag[@]}"
+    if (( ${#CFG[@]} != 0 )); then
+        echo "Kernel built-in boot parameter - not to be saved"
+        printf '\t%-20s\n' "${CFG[@]}"
+    fi
     echo
     echo "Additional boot-parameter found are saved into the »extra« field."
     echo "Found »flag« parameter with a »=value« are added also into »extra« field."
@@ -122,15 +134,18 @@ fill_tables() {
         automount fstab
         desktop desktheme fontsize
         kernel
+        norepo
+        splasht
+        toram
         )
     flg=(  # boot parameter as »flag«
-        toram
         disable_theme
         disable_background
         dostore nostore
-        savestate nosavestate
         norepo
+        savestate nosavestate
         splasht
+        toram
         )
     per=(  # boot persistence parameter
         persist_all
@@ -172,17 +187,28 @@ fill_tables() {
     for p in "${par[@]}"; do PAR["$p"]="$p"; done
     for p in "${per[@]}"; do PER["$p"]="$p"; done
     for p in "${tag[@]}"; do TAG["$p"]="$p"; done
+
+    local cfg=$(grep ^CONFIG_CMDLINE= /boot/config-$(uname -r) 2>/dev/null | tail -1 | cut -d '"' -f2)
+    for p in $cfg; do CFG["$p"]="$p";  done
+
 }
 
 #----------------------------------------------------------------------
 live_grubsave() {
 #----------------------------------------------------------------------
-
     local config_dir=/live/config
     local config=$config_dir/initrd.out
 
     [ -e $config                  ] || return # not a live system
     [ -e $config_dir/remasterable ] || return # not remasterable
+
+    #local PROC_CMDLINE=$(cat /proc/cmdline)
+    #local KERNEL_CONFIG_CMDLINE
+    #grep -q '^CONFIG_CMDLINE=' /boot/config-$(uname -r) \
+    #     && eval KERNEL_$(grep '^CONFIG_CMDLINE=' /boot/config-$(uname -r))
+    #local proc_cmdline=${PROC_CMDLINE#${KERNEL_CONFIG_CMDLINE}}
+
+    local proc_cmdline=$(cat /proc/cmdline)
 
     local pcl p q
     local -a BPR  # list of boot parameter
@@ -191,8 +217,11 @@ live_grubsave() {
     local -a XTR  # list of found extra parameter
     local -A trim # hash of trimmed parameter
 
-    local par=$(cat /proc/cmdline $config_dir/cmdline* 2>/dev/null);
-
+    # replace BOOT_IMAGE=/.../vmlinuz with kernel=vmlinuz
+    local par=$( (echo $proc_cmdline; cat $config_dir/cmdline* 2>/dev/null) |
+                 tr $'\n' ' ' |
+                 sed -r 's:\bBOOT_IMAGE=.*/(vmlinuz[0-9]*):kernel=\1:'
+                 )
     # prepare boot parameter with double quotes
     q=${par//=\\\"/=\'\"}" ";  q=${q//=\"/=\'\"};
     q=${q//\\\" /\"\'  }    ;  q=${q//\" /\"\'  };
@@ -206,6 +235,7 @@ live_grubsave() {
         [[ -z $p ]] && continue
         [[ -n ${IGN["$p"]} ]] && continue
         [[ -n ${IGN["$c"]} ]] && continue
+        [[ -n ${CFG["$c"]} ]] && continue
 
         if [[ -n ${TAG[$p]} ]]; then
            [[ $p == extra ]] && XTR=()
@@ -443,39 +473,41 @@ live_grubsave() {
 #${GRUB_DEV:+[$GRUB_DEV] @ }$grub_env
 EOF
 
-    if (( ${#GRP[@]} > 0 )) && touch ${grub_env} 2>/dev/null; then
-        echo "$grub_head"   | teecat ${grub_env}
-        #echo "#${grub_env}" | teecat -a ${grub_env}
-        for p in $( printf "%s\n" ${!GRP[@]} | sort ); do
-            [[ -z ${GRP[$p]} ]] && continue
-            # extra last
-            [[ $p == extra ]] && continue
+	    if [ "$RESET" = "true" ] && touch ${grub_env} 2>/dev/null; then
+	        echo "$grub_head"   | teecat ${grub_env}
+	    elif (( ${#GRP[@]} > 0 )) && touch ${grub_env} 2>/dev/null; then
+	        echo "$grub_head"   | teecat ${grub_env}
+	        #echo "#${grub_env}" | teecat -a ${grub_env}
+	        for p in $( printf "%s\n" ${!GRP[@]} | sort ); do
+	            [[ -z ${GRP[$p]} ]] && continue
+	            # extra last
+	            [[ $p == extra ]] && continue
 
-            if [[ $p == splasht ]]; then
-                #(( CNT[$p] == 1 )) && continue
-                if [[ ${GRP[$p]} == "splasht=" ]]; then
-                    echo $p='""' | teecat -a ${grub_env}
-                else
-                    echo $p='"'"${GRP[$p]}"'"' | teecat -a ${grub_env}
-                fi
-                continue
-            fi
-            [[ -z ${GRP[$p]} ]] && continue
-            echo $p='"'"${GRP[$p]}"'"' | teecat -a ${grub_env}
+	            if [[ $p == splasht ]]; then
+	                #(( CNT[$p] == 1 )) && continue
+	                if [[ ${GRP[$p]} == "splasht=" ]]; then
+	                    echo $p='""' | teecat -a ${grub_env}
+	                else
+	                    echo $p='"'"${GRP[$p]}"'"' | teecat -a ${grub_env}
+	                fi
+	                continue
+	            fi
+	            [[ -z ${GRP[$p]} ]] && continue
+	            echo $p='"'"${GRP[$p]}"'"' | teecat -a ${grub_env}
 
-        done
-        p=extra
-        extra=${GRP[$p]}
-        extra="${extra% }"
-        if [ -n "$extra" ]; then
-            if [ -z "${extra//*\"*/}" ]; then
-                echo $p="'${extra//\'/\"}'" | teecat -a ${grub_env}
-            else
-                echo $p='"'"${extra}"'"' | teecat -a ${grub_env}
-            fi
-        fi
-    fi
-    sync; sync
+	        done
+	        p=extra
+	        extra=${GRP[$p]}
+	        extra="${extra% }"
+	        if [ -n "$extra" ]; then
+	            if [ -z "${extra//*\"*/}" ]; then
+	                echo $p="'${extra//\'/\"}'" | teecat -a ${grub_env}
+	            else
+	                echo $p='"'"${extra}"'"' | teecat -a ${grub_env}
+	            fi
+	        fi
+	    fi
+	    sync; sync
     fi
 
     if [[ ! $KEEP_MOUNTED ]]; then

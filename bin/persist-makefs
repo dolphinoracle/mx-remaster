@@ -297,6 +297,13 @@ main() {
 
 makefs() {
     local file=$1  type=$2  size=$3  dir=$(dirname "$file")
+    local base_file=${file##*/}
+    base_file=${base_file%%.*}
+    local fs_label=""
+    case $type in
+        ext*) fs_label="-L $base_file" ;;
+    esac
+
     mkdir -p "$dir"                                                              || return 1
     test -d "$dir"                                                               || return 1
     local fs_type=(fs_type "$dir")
@@ -306,7 +313,7 @@ makefs() {
     esac
 
     sync
-    time_cmd_quiet mkfs.$type -F $file                                           || return 3
+    time_cmd_quiet mkfs.$type -F $fs_label $file                                     || return 3
 }
 
 default_makefs_size() {
