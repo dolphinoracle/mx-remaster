@@ -1,6 +1,6 @@
 mx-remaster (23.01.01mx21) mx; urgency=medium
 
-  * update "installed-to-live" to deal with adduser 1.30 changes 
+  * update "installed-to-live" to deal with adduser 3.130 changes 
 
  -- Dolphin Oracle <dolphinoracle@gmail.com>  Sun, 01 Jan 2023 14:35:01 -0500
 
