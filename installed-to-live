@@ -785,7 +785,7 @@ munge_files() {
 	[ "$VERBOSE" ] && quiet=""
 
     local added_user="live_temp_user"$(dd if=/dev/urandom bs=1 count=40 2>/dev/null | md5sum | cut -c 1-12)
-    pretend adduser $quiet --disabled-login --no-create-home --gecos $def_user $added_user
+    pretend adduser $quiet --disabled-login --shell /usr/bin/bash --no-create-home --gecos $def_user $added_user
     local added_group=$(id -u $added_user 2>/dev/null)
 
 
