@@ -1,3 +1,10 @@
+mx-remaster (23.01.02mx21) mx; urgency=medium
+
+  [fehlix]
+  * additional shell checks in installed to live
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Tue, 03 Jan 2023 22:33:56 -0500
+
 mx-remaster (23.01.01mx21) mx; urgency=medium
 
   * update "installed-to-live" to deal with adduser 3.130 changes 
