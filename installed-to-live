@@ -36,6 +36,10 @@ TEMPLATE_DIR=/usr/local/share/live-files
 DEF_TZ="America/New_York"
 DEF_REPO="us"
 
+DEF_SHELL="/usr/bin/bash"
+DEF_BIN=$(sed -n '/^valid_user()/,/^}/{/^\s*local ent=/{s=.*:/bin/.*=/bin=p;q}}' /live/etc/init.d/live-init 2>/dev/null)
+[ x"$DEF_BIN" = x"/bin" ] && DEF_SHELL="/bin/bash"
+
 PRETEND=
 
 SUBID_FILES="/etc/subuid /etc/subgid"
@@ -780,12 +784,15 @@ munge_files() {
         esac
     done
 
-    # we add a new user  temporarily
-  	local quiet="--quiet"
-	[ "$VERBOSE" ] && quiet=""
+    # we add a new user temporarily
+    local quiet="--quiet"
+    [ "$VERBOSE" ] && quiet=""
+
+    local comment_opt=$(LC_ALL=C adduser --help 2>/dev/null | grep -m1 -o -- --comment | head -1)
+    [ x"$comment_opt" != x"--comment" ] && comment_opt="--gecos"
 
     local added_user="live_temp_user"$(dd if=/dev/urandom bs=1 count=40 2>/dev/null | md5sum | cut -c 1-12)
-    pretend adduser $quiet --disabled-login --shell /usr/bin/bash --no-create-home --gecos $def_user $added_user
+    pretend adduser $quiet --disabled-login --shell "${DEF_SHELL:-/usr/bin/bash}" --no-create-home  $comment_opt $def_user $added_user
     local added_group=$(id -u $added_user 2>/dev/null)
 
 
