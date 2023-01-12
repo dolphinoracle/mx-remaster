@@ -1,3 +1,9 @@
+mx-remaster (23.01.03mx21) mx; urgency=medium
+
+  * on user reset, respect Default shell set in /etc/adduser.conf
+
+ -- Dolphin Oracle <dolphinoracle@gmail.com>  Wed, 11 Jan 2023 19:23:14 -0500
+
 mx-remaster (23.01.02mx21) mx; urgency=medium
 
   [fehlix]
