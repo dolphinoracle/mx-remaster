@@ -1,4 +1,4 @@
-mx-remaster (23.02.01mx23) mx; urgency=medium
+mx-remaster (23.02.01mx21) mx; urgency=medium
 
   * mask initrd.target 
 
