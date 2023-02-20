@@ -14,6 +14,7 @@ if [ "$1" = "remove" ]; then
 		deb-systemd-helper mask 'persist-autosave.service' >/dev/null || true
 		deb-systemd-helper mask 'live-static-shutdown.service' >/dev/null || true
 		deb-systemd-helper mask 'hwclock-mx.service' >/dev/null || true
+		deb-systemd-helper unmask 'initrd.target' >/dev/null ||true
 	fi
 fi
 
@@ -33,5 +34,6 @@ if [ "$1" = "purge" ]; then
 		deb-systemd-helper unmask 'live-static-shutdown.service' >/dev/null || true
 		deb-systemd-helper purge 'hwclock-mx.service' >/dev/null || true
 		deb-systemd-helper unmask 'hwclock-mx.service' >/dev/null || true
+		deb-systemd-helper unmask 'initrd.target' >/dev/null ||true
 	fi
 fi
