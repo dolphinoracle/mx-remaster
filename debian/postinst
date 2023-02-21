@@ -145,10 +145,11 @@ if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-decon
 	fi
 fi
 
-if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
-	# This will only remove masks created by d-s-h on package removal.
-	deb-systemd-helper mask 'initrd.target' >/dev/null || true
-
+if [ -h /etc/systemd/system/initrd.target ]; then
+    if [ $(readlink /etc/systemd/system/initrd.target) = "/dev/null" ]; then
+		rm /etc/systemd/system/initrd.target
+	fi
 fi
+
 
 exit 0
