@@ -2,6 +2,7 @@
 
 # GETTEXT_KEYWORD="gt"
 # GETTEXT_KEYWORD="pfgt"
+# GETTEXT_KEYWORD="error_box_pf"
 
 antiX_lib=/usr/local/lib/antiX
 source $antiX_lib/antiX-common.sh     "$@"
@@ -31,6 +32,14 @@ BLURB="
     1) [b]$_Automatic_[/] ($(gt "at shutdown/reboot, no asking"))
     2) [b]$_Semi_Automatic_[/] ($(gt "ask at shutdown/reboot"))
     3) [b]$_Manual_[/] ($(gt "you snooze, you lose"))"
+    
+if [ -e /live/config/systemd ]; then
+    BLURB="
+    $(gt "Configure root persistence saves to run either:")
+
+    1) [b]$_Automatic_[/] ($(gt "at shutdown/reboot, no asking"))
+    3) [b]$_Manual_[/] ($(gt "you snooze, you lose"))"
+fi
 
 A="$(pfgt "This program should be called with the %s option in a startup script to ensure a config file is created."\
     "[p]--startup[/]")"
@@ -65,6 +74,13 @@ extra_args   0
 
 [ "$SET_COMMAND" ] && SET_SHUT_DOWN=true
 
+case $OPT_COMMAND in
+                         "")                             ;;
+        reboot|/sbin/reboot)  OPT_COMMAND=/sbin/reboot   ;;
+    poweroff|/sbin/poweroff)  OPT_COMMAND=/sbin/poweroff ;;
+                          *)  error_box_pf "This script can only run the commands %s and %s" 'poweroff' 'reboot' ;;
+esac
+
 #show_cli_title
 
 need_root
@@ -78,7 +94,10 @@ exit_command() {
 
     # chvt so we see shutdown messages on tty1
     case $OPT_COMMAND in
-        reboot|poweroff) sync; chvt 1 2>/dev/null ;;
+        reboot|poweroff)
+            sync
+            [ -e "/live/config/systemd" ] || chvt 1 2>/dev/null
+            ;;
     esac
     exec $OPT_COMMAND
 }
@@ -87,15 +106,27 @@ edit_config() {
     [ -f $CONF_FILE ] && source $CONF_FILE
 
     if [ "$AUTOSAVE_MODE" ]; then
-        mode_str="$(pfgt "Current mode is: %s" "[f]$AUTOSAVE_MODE[/]")"
+        mode_str="$(pfgt "Current mode is: %s" "[f]${AUTOSAVE_MODE#? }[/]")"
     else
-        mode_str="$(pfgt "There is no current auto-save mode.  The default is: %s." "[b]$_Semi_Automatic_[/]")"
+        mode_str="$(pfgt "There is no current auto-save mode.  The default is: %s." "[b]$_Automatic_[/]")"
     fi
 
     fmt="[fixed][b]%15s:[/][/] %s   "
-    combo_box save-mode "1 $_Automatic_!2 $_Semi_Automatic_!3 $_Manual_!4 $_Quit_" -n \
+    if [ -e "/live/config/systemd" ]; then
+    combo_box save-mode "1 $_Automatic_!3 $_Manual_!4 $_Quit_" -n \
         "$TITLE" ""                                                    \
-        "Please choose auto-save mode."                                \
+        "$(gt "Please choose auto-save mode.")"                        \
+        ""                                                             \
+        "$mode_str"                                                    \
+        ""                                                             \
+        "$(pf "$fmt" "$_Automatic_"      "`gt "save on shutdown/reboot automatically.  No asking."`")"   \
+        "$(pf "$fmt" "$_Manual_"         "`gt "only save changes manually (you snooze, you lose)."`")"   \
+        "$(pf "$fmt" "$_Quit_"           "`gt "use current default."`")"                                 \
+        ""
+    else
+        combo_box save-mode "1 $_Automatic_!2 $_Semi_Automatic_!3 $_Manual_!4 $_Quit_" -n \
+        "$TITLE" ""                                                    \
+        "$(gt "Please choose auto-save mode.")"                        \
         ""                                                             \
         "$mode_str"                                                    \
         ""                                                             \
@@ -104,6 +135,7 @@ edit_config() {
         "$(pf "$fmt" "$_Manual_"         "`gt "only save changes manually (you snooze, you lose)."`")"   \
         "$(pf "$fmt" "$_Quit_"           "`gt "use current default."`")"                                 \
         ""
+    fi
 
     AUTOSAVE_MODE=$UI_RESULT
 

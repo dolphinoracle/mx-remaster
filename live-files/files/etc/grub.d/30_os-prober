@@ -1,5 +1,16 @@
 #! /bin/sh
+
+#tag for mx-system update
+#mx-system 20.11.02+4
+
+export LVM_SUPPRESS_FD_WARNINGS=true
+
+if [ "x$(debconf-get-selections |grep  '^grub-pc\sgrub2/enable_os_prober\sboolean\strue' | awk '{print $4}')" = "xtrue" ]; then
+   export GRUB_DISABLE_OS_PROBER="false"
+fi
+
 set -e
+
 
 # grub-mkconfig helper script.
 # Copyright (C) 2006,2007,2008,2009  Free Software Foundation, Inc.
@@ -243,7 +254,7 @@ EOF
         LBOOT="`echo ${LINUX} | cut -d ':' -f 2`"
         LLABEL="`echo ${LINUX} | cut -d ':' -f 3 | tr '^' ' '`"
         LKERNEL="`echo ${LINUX} | cut -d ':' -f 4`"
-        LINITRD="`echo ${LINUX} | cut -d ':' -f 5`"
+        LINITRD="`echo ${LINUX} | cut -d ':' -f 5  | tr '^' ' '`"
         LPARAMS="`echo ${LINUX} | cut -d ':' -f 6- | tr '^' ' '`"
 
         if [ -z "${LLABEL}" ] ; then

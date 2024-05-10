@@ -13,7 +13,7 @@
 ### END INIT INFO
 #
 
-PIDFILE=/var/run/gpm.pid
+PIDFILE=/run/gpm.pid
 GPM=/usr/sbin/gpm
 CFG=/etc/gpm.conf
 
@@ -23,7 +23,7 @@ test -x $GPM || exit 0
 
 . /lib/lsb/init-functions
 
-if [ "$(id -u)" != "0" ]
+if [ "$(id -u)" != "0" ] && [ "$1" != status ]
 then
   log_failure_msg "You must be root to start, stop or restart gpm."
   exit 1
@@ -102,8 +102,11 @@ case "$1" in
      gpm_stop && sleep 3
      gpm_start || exit 1
      ;;
+  status)
+     status_of_proc $GPM gpm && exit 0 || exit $?
+     ;;
   *)
-     echo "Usage: /etc/init.d/gpm {start|stop|restart|force-reload|strace}"
+     echo "Usage: /etc/init.d/gpm {start|stop|restart|force-reload|strace|status}"
      exit 1
 esac
 

@@ -65,6 +65,7 @@ prep_main() {
 
     need_root
     start_logging live-remaster
+    save_log_file
 
     if [ "$SET_GUI" ]; then
         which $GUI_TERM &>/dev/null \
@@ -75,6 +76,9 @@ prep_main() {
 }
 
 main() {
+
+    check_boot_uuid || error_box_pf "Error when checking for %s device"  'live-usb'
+
     #--- Mount device holding linuxfs if needed
     mount_if_needed $BOOT_DEV $BOOT_MP
     make_readwrite $BOOT_MP 2 || error_box_pf "The live file system is read-only.  Cannot remaster."
@@ -216,7 +220,7 @@ main() {
     kill_bg_info_box
 
     [ $boot_avail -lt $safe_estimate_xz ] && \
-        error_box_pf "Have: %s megs available.  Need: %s." "[n]$boot_avail[/]" "[n]$safe_estimate_xz[/]"
+        error_box_pf "Have: %s MiB available.  Need: %s." "[n]$boot_avail[/]" "[n]$safe_estimate_xz[/]"
 
     while [ "$BAD_FILES" ]; do
         yes_no_box                                                        \
@@ -255,27 +259,64 @@ main() {
         HOME=/root alsactl --ignore store
     fi
 
-    COMP_TYPE=lz4
+    # Make sure the running kernel supports the compression type
+    COMP_TYPE=gzip
+    local   lz4_option="lz4 $(gt "(compresses MUCH faster, boots faster)")"
+    local  gzip_option="gzip $(gt "(compresses faster, boots faster)")"
+    local    xz_option="xz $(gt "(compresses better)")"
 
-    lz4_option="lz4 $(gt "(compresses MUCH faster, boots faster)")"
-    gzip_option="gzip $(gt "(compresses faster, boots faster)")"
-      xz_option="xz $(gt "(compresses better)")"
+    local  lz4_lab="$(pfgt "%s is not supported by this kernel" "[b]lz4[/b]")"
+    local gzip_lab="$(pfgt "%s will take less time" "[b]gzip[/b]")"
+    local   xz_lab="$(pfgt "%s is not supported by this kernel" "[b]xz[/b]")"
+
+    local have_lz4=true  have_xz=true  k_config=/boot/config-$(uname -r)
+    if test -r $k_config; then
+        grep -q "^CONFIG_SQUASHFS_LZ4=y" $k_config || have_lz4=
+        grep -q "^CONFIG_SQUASHFS_XZ=y"  $k_config || have_xz=
+    fi
+
+    local option_list=$gzip_option
+
+    if [ $boot_avail -lt $safe_estimate_lz4 ]; then
+        have_lz4=
+        lz4_lab="$(pfgt "There is not enough space to use %s compression" "[b]lz4[/b]")"
+    fi
+
+    if [ "$have_lz4" ]; then
+        option_list="$lz4_option!$option_list"
+        lz4_lab="$(pfgt "%s will take MUCH less time" "[b]lz4[/b]")"
+        COMP_TYPE=lz4
+    fi
+
+    if [ "$have_xz" ]; then
+        option_list="$option_list!$xz_option"
+        xz_lab="$(pfgt "%s will result in a smaller file" "[b]xz[/b]")"
+    fi
 
     if [ $boot_avail -ge $safe_estimate_gz ]; then
+        if [ -z "$have_lz4$have_xz" ]; then
+            info_box -c "$(pfgt "This kernel only supports %s compression" "[b]gzip[/b]")"
+            COMP_TYPE=gzip
+        else
+            combo_box compression-type "$option_list"                   \
+                "$TITLE" ""                                             \
+                "$(gt "Please choose the type of compression to use")"  \
+                    "$lz4_lab" \
+                    "$gzip_lab" \
+                    "$xz_lab"
 
-        combo_box compression-type "$lz4_option!$gzip_option!$xz_option"         \
-            "$TITLE" ""                                                          \
-            "$(gt "Please choose the type of compression to use")"               \
-            "$(pfgt "%s will take MUCH less time" "[b]lz4[/b]")"                 \
-            "$(pfgt "%s will take less time" "[b]gzip[/b]")"                     \
-            "$(pfgt "%s will result in a smaller file" "[b]xz[/b]")"
-
-        #UI_RESULT=xz
-        case $UI_RESULT in
-            gzip*) COMP_TYPE="gzip" ;;
-              xz*) COMP_TYPE="xz"   ;;
-             lz4*) COMP_TYPE="lz4"  ;;
-        esac
+            #UI_RESULT=xz
+            case $UI_RESULT in
+                gzip*) COMP_TYPE="gzip" ;;
+                  xz*) COMP_TYPE="xz"   ;;
+                 lz4*) COMP_TYPE="lz4"  ;;
+            esac
+        fi
+    elif [ $boot_avail -ge $safe_estimate_zx ]; then
+        info_box -c "Must use %s compression due to size constraints" "[b]xz[/b]"
+        COMP_TYPE="xz"
+    else
+        error_box_pf "There is not enough space to do a live-remaster"
     fi
 
     OTHER_OPTS="$OTHER_OPTS -comp $COMP_TYPE"
@@ -368,7 +409,8 @@ Version_Info_End
 
     T0=$(get_time)
     if [ "$SET_GUI" ]; then
-        ($GUI_TERM $TERM_TITLE_OPT "$(gt "Remastering -- DO NOT CLOSE")" $TERM_OPTS $MKSQ_COMMAND &>/dev/null)&
+        #($GUI_TERM $TERM_TITLE_OPT "$(gt "Remastering -- DO NOT CLOSE")" $TERM_OPTS $MKSQ_COMMAND &>/dev/null)&
+        ($GUI_TERM $TERM_OPTS $MKSQ_COMMAND &>/dev/null)&
         local term_pid=$!  mksq_pid i
 
         # Try to get the PID for 3 seconds and then bailout
@@ -431,7 +473,7 @@ Version_Info_End
         done
 
     else
-        $MKSQ_COMMAND
+    	$MKSQ_COMMAND
         finish_remaster
     fi
 
@@ -458,22 +500,27 @@ Version_Info_End
     #    "$(pfgt "Use the %s  boot option to return to the current system."  "[b]rollback[/]")" \
     #    "" ""                                                                                  \
 
-    [ -e $LIVE_DIR/config/persist-save.conf \
-        -o -e $LIVE_DIR/config/persist-root ] || exit 0
-    which persist-makefs &>/dev/null          || exit 0
+    if [ -e $LIVE_DIR/config/persist-save.conf \
+        -o -e $LIVE_DIR/config/persist-root ] && 
+        which persist-makefs &>/dev/null      ; then
 
-    opts=
-    [ "$SET_QUIET"  ] && opts=--quit
-    [ "$SET_NO_LOG" ] && opts="$opts --nolog"
-    [ "$SET_GUI"    ] || opts="$opts --cli"
-
-    yes_no_box \
-            "$(gt "Root persistence is enabled")"                \
-            ""                                                   \
-            "$(pfgt "Do you want to make a new %s file now?" "[f]rootfs.new[/]")" \
-            "" "" \
-            && persist-makefs --rootfs $opts
+	    opts=
+	    [ "$SET_QUIET"  ] && opts=--quit
+	    [ "$SET_NO_LOG" ] && opts="$opts --nolog"
+	    [ "$SET_GUI"    ] || opts="$opts --cli"
+	
+	    if yes_no_box \
+	       "$(gt "Root persistence is enabled")"                \
+	       ""                                                   \
+	       "$(pfgt "Do you want to make a new %s file now?" "[f]rootfs.new[/]")" \
+	       "" ""; then
+	       persist-makefs --rootfs $opts
+	    fi
+    fi
+    LUKS_CLOSE="$CLOSE_LUKS"
+    clean_up
     exit 0
+    
 }
 
 send_sig() {
@@ -533,9 +580,15 @@ finish_remaster() {
 
     mv $tmp_file $new_file
 
+    local state_dir=$(dirname $new_file)/state
+    rm -rf $state_dir.new
+    test -d $state_dir && cp -a $state_dir $state_dir.new
+
     qmsg 'Making md5 sum ...'
 
-    cat $new_file | md5sum > $SQFILE_FULL.md5.new
+    local md5_file=$SQFILE_FULL.md5.new
+    cat $new_file | md5sum > $md5_file
+    sed -i "s/ .*/  $SQFILE_NAME/" $md5_file
 
     local_clean_up && trap EXIT
 
@@ -588,7 +641,7 @@ is_xz_squashfs() {
 sqfs_comp_type() {
     local file=$1
     comp_num=$(echo $(dd if="$file" bs=1 skip=20 count=2 status=none | od -An -tdI))
-    echo "comp_num: >$comp_num<" >&2
+    #echo "comp_num: >$comp_num<" >&2
     case $comp_num in
         1) echo gzip    ;;
         2) echo lzma    ;;
@@ -640,10 +693,75 @@ set_dirty_bytes() {
 # Restore to the original values
 #------------------------------------------------------------------------------
 restore_dirty_bytes_and_ratio() {
-    [ -n "$ORIG_DIRTY_BYTES" ] && sysctl vm.dirty_bytes=$ORIG_DIRTY_BYTES >> $LOG_FILE
-    [ -n "$ORIG_DIRTY_RATIO" ] && sysctl vm.dirty_ratio=$ORIG_DIRTY_RATIO >> $LOG_FILE
+    [ "${ORIG_DIRTY_BYTES:-0}" -ne 0 ] && sysctl vm.dirty_bytes=$ORIG_DIRTY_BYTES >> $LOG_FILE
+    [ "${ORIG_DIRTY_RATIO:-0}" -ne 0 ] && sysctl vm.dirty_ratio=$ORIG_DIRTY_RATIO >> $LOG_FILE
     unset ORIG_DIRTY_BYTES ORIG_DIRTY_RATIO
 }
+
+#------------------------------------------------------------------------------
+#
+#------------------------------------------------------------------------------
+check_boot_uuid() {
+    local uuid_dev=$(blkid -U "$BOOT_UUID" -c /dev/null)
+    if [ -n "$uuid_dev" ]; then
+        BOOT_DEV="$uuid_dev"
+        return 0
+    fi
+
+    if [ "$ENCRYPTED" ]; then
+        local crypt_dev=$(blkid -U "$CRYPT_UUID" -c /dev/null)
+        [ -z "$crypt_dev" ] && error_box \
+            "$(pf $"The encrypted partition with UUID %s was not found" "[n]$CRYPT_UUID[/]")" \
+            $"Please plug in the live-usb device and try again"
+
+        local crypt_name=$ME
+        if [ -z "$SET_GUI" ]; then
+            echo "Encrypted live-usb detected"
+            echo "You will be asked to enter the passphrase below"
+            cryptsetup open --type luks $crypt_dev $crypt_name || error_box \
+                "$(pf $"Failed to open the encrypted partition")"
+        else
+            local try max_try=3 fail
+            for try in $(seq 1 $max_try); do
+                get_password "" ""                                        \
+                $"Encrypted live-usb detected"                            \
+                ""                                                        \
+                $"Be sure to set the keyboard layout to English"          \
+                ""                                                        \
+                "$(pf $"This is try %s out of $s" $try $max_try)"         \
+                ""                                                        \
+                $"Please enter the passphrase" \
+                ""
+
+                fail=
+
+                printf "$UI_RESULT" |  cryptsetup open --type luks $crypt_dev $crypt_name -d - && break
+
+                fail=true
+
+                warn_box $"That passphrase did not match"    \
+                         ""                                  \
+                         $"Please try again"
+            done
+
+            [ "$fail" ] && error_box \
+                "$(pf $"Passphrase failed to match after %s attempts" $max_try)"
+        fi
+
+        CLOSE_LUKS="$crypt_name"
+        BOOT_DEV=/dev/mapper/$crypt_name
+
+        return 0
+    fi
+
+    [ -z "$uuid_dev" ] &&  error_box \
+        "$(pf $"The persistence device with UUID %s was not found" "[n]$PERSIST_UUID[/]")" \
+        "$(pf $"Please plug in the persistence device and try again")"
+
+    vpf "Using device %s with UUID %s" "[n]$uuid_dev[/]" "[n]$PERSIST_UUID[/]"
+    PERSIST_DEV=$uuid_dev
+}
+
 
 
 prep_main "$@"

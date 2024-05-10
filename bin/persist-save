@@ -39,6 +39,7 @@ main() {
     # First make sure script is run as root.
     need_root
     start_logging
+    save_log_file
 
     grep -q "^PERSISTENCE=.*dynamic" /live/config/initrd.out || error_box_pf "%s was not enabled.  Cannot %s" "Dynamic root persistence" "${0##*/}"
 
@@ -49,7 +50,7 @@ main() {
     trap clean_up EXIT
     create_lock
 
-    check_persist_uuid || error_box "Error when checking for persistence device"
+    check_persist_uuid || error_box "Error when checking for %s device" 'persistence'
 
     if which alsactl &>/dev/null; then
         vpf "Storing volume settings"
@@ -221,9 +222,15 @@ check_vid() {
     return 0
 }
 
+#------------------------------------------------------------------------------
+#
+#------------------------------------------------------------------------------
 check_persist_uuid() {
     local uuid_dev=$(blkid -U "$PERSIST_UUID" -c /dev/null)
-    [ -n "$uuid_dev" ] && return 0
+    if [ -n "$uuid_dev" ]; then
+        PERSIST_DEV="$uuid_dev"
+        return 0
+    fi
 
     if [ "$ENCRYPTED" ]; then
         local crypt_dev=$(blkid -U "$CRYPT_UUID" -c /dev/null)
@@ -241,7 +248,7 @@ check_persist_uuid() {
         else
             local try max_try=3 fail
             for try in $(seq 1 $max_try); do
-                get_text title ""                                         \
+                get_password "" ""                                         \
                 $"Encrypted live-usb detected"                            \
                 ""                                                        \
                 $"Be sure to set the keyboard layout to English"          \
@@ -253,7 +260,7 @@ check_persist_uuid() {
 
                 fail=
 
-                echo "$UI_RESULT" |  cryptsetup open --type luks $crypt_dev $crypt_name --key-file - && break
+                printf "$UI_RESULT" |  cryptsetup open --type luks $crypt_dev $crypt_name -d - && break
 
                 fail=true
 
@@ -266,7 +273,7 @@ check_persist_uuid() {
                 "$(pf $"Passphrase failed to match after %s attempts" $max_try)"
         fi
 
-
+        LUKS_CLOSE="$LUKS_CLOSE $crypt_name"
         PERSIST_DEV=/dev/mapper/$crypt_name
 
         return 0
